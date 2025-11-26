@@ -1,0 +1,47 @@
+# Xcode
+xcuserdata/
+*.xcscmblueprint
+*.xccheckout
+DerivedData/
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+*.xcodeproj/project.xcworkspace/xcshareddata/
+*.xcodeproj/xcuserdata/
+
+## Playgrounds
+timeline.xctimeline
+playground.xcworkspace
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Package.resolved
+
+# IDE
+.vscode/
+.idea/
+*.xcworkspace/xcuserdata/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Test artifacts
+*.xcresult
+TestResults/
+
+# Archives
+*.xcarchive
+
+# Temporary files
+*.tmp
+*.temp
+*~
+
+# Local AI instructions
+CLAUDE.local.md
