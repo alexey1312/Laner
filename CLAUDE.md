@@ -118,7 +118,7 @@ sources[15]{path,description}:
 ## Concurrency Model
 
 ```toon
-actors[10]{type,description}:
+actors[11]{type,description}:
   ShellExecutor,Actor for thread-safe command execution
   ExecutionContext,@MainActor for isolated execution environment
   ArtifactStore,Actor for thread-safe artifact management
@@ -126,6 +126,7 @@ actors[10]{type,description}:
   CryptoService,Actor for AES-256-GCM encryption
   GitStorage,Actor for Git repository operations
   KeychainService,Actor for macOS Keychain operations
+  MatchService,Actor for Match code signing operations
   AppStoreConnectAPI,Actor for App Store Connect API
   ChunkedUploader,Actor for chunked file uploads to S3
   TestFlightService,Actor for TestFlight operations
