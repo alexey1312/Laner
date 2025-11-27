@@ -37,6 +37,11 @@ jobs:
         if: matrix.platform == 'macos-arm64'
         run: sudo xcode-select -s /Applications/Xcode_16.1.app/Contents/Developer
 
+      - name: Setup mise
+        uses: jdx/mise-action@v3
+        with:
+          cache: true
+
       - name: Replace version placeholder
         run: |
           VERSION="${{ github.ref_name }}"
@@ -48,7 +53,7 @@ jobs:
           fi
 
       - name: Build release binary
-        run: swift build -c release --arch ${{ matrix.arch }}
+        run: swift build -c release --arch ${{ matrix.arch }} 2>&1 | xcbeautify
 
       - name: Create release archive
         run: |
