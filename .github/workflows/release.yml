@@ -57,14 +57,14 @@ jobs:
 
       - name: Create release archive
         run: |
-          tar -czf laner-${{ github.ref_name }}-${{ matrix.platform }}.tar.gz \
+          tar -czf Laner-${{ github.ref_name }}-${{ matrix.platform }}.tar.gz \
             -C .build/${{ matrix.build-path }} laner
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: laner-${{ matrix.platform }}
-          path: laner-${{ github.ref_name }}-${{ matrix.platform }}.tar.gz
+          name: Laner-${{ matrix.platform }}
+          path: Laner-${{ github.ref_name }}-${{ matrix.platform }}.tar.gz
 
   release:
     needs: build
@@ -78,5 +78,5 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: artifacts/*/laner-*.tar.gz
+          files: artifacts/*/Laner-*.tar.gz
           generate_release_notes: true
