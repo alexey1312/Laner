@@ -2,14 +2,14 @@
 
 ## Overview
 
-**Swiftlane** — open-source Swift CLI инструмент для iOS CI/CD, полностью заменяющий Fastlane.
+**Swiftlane** — an open-source Swift CLI tool for iOS CI/CD, fully replacing Fastlane.
 
-**Цели:**
-- Избавиться от Ruby зависимости
-- Ускорить CI pipeline
-- Type-safe конфигурация через Swift DSL
-- Образовательный проект для понимания CI/CD изнутри
-- **Кроссплатформенность: macOS + Linux**
+**Goals:**
+- Eliminate Ruby dependency
+- Speed up CI pipelines
+- Type-safe configuration via Swift DSL
+- Educational project for understanding CI/CD internals
+- **Cross-platform: macOS + Linux**
 
 ## Architecture
 
@@ -95,9 +95,9 @@ let swiftlane = Swiftlanefile(
 
 ## Implementation Phases
 
-### Phase 1: Foundation (2-3 weeks)
+### Phase 1: Foundation
 
-**Goal:** Базовый CLI с xcodebuild wrapper
+**Goal:** Basic CLI with xcodebuild wrapper
 
 **Deliverables:**
 1. Swift Package structure
@@ -128,13 +128,13 @@ struct XcodebuildExecutor {
 
 ---
 
-### Phase 2: DSL & Configuration (2 weeks)
+### Phase 2: DSL & Configuration
 
-**Goal:** Swift DSL для конфигурации lanes
+**Goal:** Swift DSL for lane configuration
 
 **Deliverables:**
-1. `SwiftlaneDSL` module с result builders
-2. `Lane` protocol и `@LaneBuilder`
+1. `SwiftlaneDSL` module with result builders
+2. `Lane` protocol and `@LaneBuilder`
 3. Actions API (gym, scan, match, etc.)
 4. Environment variables handling
 5. Swiftlanefile compilation & execution
@@ -168,9 +168,9 @@ struct Lane {
 
 ---
 
-### Phase 3: Code Signing — Match Alternative (3 weeks)
+### Phase 3: Code Signing — Match Alternative
 
-**Goal:** Полная замена fastlane match
+**Goal:** Full replacement for fastlane match
 
 **Deliverables:**
 1. Git-based certificate storage
@@ -205,7 +205,7 @@ struct CryptoService {
 
 ---
 
-### Phase 4: App Store Connect Integration (2 weeks)
+### Phase 4: App Store Connect Integration
 
 **Goal:** Upload to TestFlight, manage builds
 
@@ -231,7 +231,7 @@ struct AppStoreConnectAPI {
 
 ---
 
-### Phase 5: Firebase App Distribution (1 week)
+### Phase 5: Firebase App Distribution
 
 **Goal:** Upload to Firebase
 
@@ -248,7 +248,7 @@ struct FirebaseDistributionService {
 
 ---
 
-### Phase 6: Notifications & Integrations (1 week)
+### Phase 6: Notifications & Integrations
 
 **Goal:** Jira, Slack notifications
 
@@ -269,7 +269,7 @@ struct SlackNotificationService: NotificationService { }
 
 ---
 
-### Phase 7: Metrics & Telemetry (1 week)
+### Phase 7: Metrics & Telemetry
 
 **Goal:** Build time tracking, size metrics
 
@@ -281,7 +281,7 @@ struct SlackNotificationService: NotificationService { }
 
 ---
 
-### Phase 8: Polish & Documentation (2 weeks)
+### Phase 8: Polish & Documentation
 
 **Goal:** Production-ready release
 
@@ -296,11 +296,11 @@ struct SlackNotificationService: NotificationService { }
 
 | Package | Version | Purpose | Linux Support |
 |---------|---------|---------|---------------|
-| swift-argument-parser | 1.3+ | CLI argument parsing | ✅ |
-| swift-log | 1.5+ | Structured logging | ✅ |
-| swift-crypto | 3.0+ | Encryption (replaces CryptoKit on Linux) | ✅ |
-| async-http-client | 1.19+ | HTTP requests | ✅ |
-| Yams | 5.0+ | YAML parsing | ✅ |
+| swift-argument-parser | 1.3+ | CLI argument parsing | Yes |
+| swift-log | 1.5+ | Structured logging | Yes |
+| swift-crypto | 3.0+ | Encryption (replaces CryptoKit on Linux) | Yes |
+| async-http-client | 1.19+ | HTTP requests | Yes |
+| Yams | 5.0+ | YAML parsing | Yes |
 
 ## Linux Support Strategy
 
@@ -326,13 +326,13 @@ import Crypto  // swift-crypto
 
 | Feature | macOS | Linux |
 |---------|-------|-------|
-| Build/Test (xcodebuild) | ✅ | ❌ (macOS only) |
-| Swift Package build | ✅ | ✅ |
-| App Store Connect API | ✅ | ✅ |
-| Firebase upload | ✅ | ✅ |
-| Match (certificates) | ✅ | ❌ (Keychain required) |
-| Notifications (Jira/Slack) | ✅ | ✅ |
-| Metrics/Telemetry | ✅ | ✅ |
+| Build/Test (xcodebuild) | Yes | No (macOS only) |
+| Swift Package build | Yes | Yes |
+| App Store Connect API | Yes | Yes |
+| Firebase upload | Yes | Yes |
+| Match (certificates) | Yes | No (Keychain required) |
+| Notifications (Jira/Slack) | Yes | Yes |
+| Metrics/Telemetry | Yes | Yes |
 
 ### Linux Use Cases
 
@@ -519,12 +519,10 @@ let swiftlane = Swiftlanefile(
 
 ## Repository Setup
 
-**Location:** `/Users/aleksei/Developer/swiftlane`
-
 ### Initial Structure
 
 ```bash
-/Users/aleksei/Developer/swiftlane/
+swiftlane/
 ├── Package.swift
 ├── README.md
 ├── LICENSE                          # MIT
@@ -766,7 +764,7 @@ jira(ticket:comment:)
 
 ## Implementation Order (Full Design First)
 
-### Week 1-2: Architecture & Interfaces
+### Weeks 1-2: Architecture & Interfaces
 
 1. **Define all protocols and interfaces**
    - `Action`, `Lane`, `SwiftlaneConfiguration`
@@ -781,14 +779,14 @@ jira(ticket:comment:)
    - Custom error types
    - Recovery strategies
 
-### Week 3-4: Core Infrastructure
+### Weeks 3-4: Core Infrastructure
 
 1. **ShellExecutor** — async process execution
 2. **Logger** — structured logging with swift-log
 3. **Environment** — env vars, CI detection
 4. **FileManager extensions** — IPA, dSYM handling
 
-### Week 5-6: XcodeBuild Integration
+### Weeks 5-6: XcodeBuild Integration
 
 1. **XcodebuildExecutor**
    - build, test, archive
@@ -796,14 +794,14 @@ jira(ticket:comment:)
 2. **SimctlExecutor** — simulator management
 3. **gym/scan/archive actions**
 
-### Week 7-8: Match Plugin (Code Signing)
+### Weeks 7-8: Match Plugin (Code Signing)
 
 1. **GitRepository** — clone, commit, push
 2. **CryptoService** — AES-256-GCM encryption
 3. **KeychainService** — certificate installation
 4. **match action**
 
-### Week 9-10: AppStore Plugin
+### Weeks 9-10: AppStore Plugin
 
 1. **JWT authentication**
 2. **Build upload** (altool wrapper)
@@ -828,7 +826,7 @@ jira(ticket:comment:)
 
 ### Danger Swift Architecture ([source](https://danger.systems/swift/tutorials/architecture))
 
-**"Swift sandwich":** Danger JS → Danger Swift → Danger JS
+**"Swift sandwich":** Danger JS -> Danger Swift -> Danger JS
 - Danger JS handles CI/platform detection (GitHub, GitLab, BitBucket)
 - Swift only processes rules
 - JSON as transport between layers
@@ -870,7 +868,7 @@ public func checkForCopyrightHeaders() {
 
 ## Next Steps
 
-1. **Create repository** at `/Users/aleksei/Developer/Swiftlane`
+1. **Create repository**
 2. **Initialize Package.swift** with all targets
 3. **Define core protocols** (Action, Lane, Plugin)
 4. **Implement DSL** with result builders

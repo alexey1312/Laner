@@ -1,61 +1,61 @@
-# Анализ фундаментальных проблем Fastlane
+# Analysis of Fastlane's Fundamental Problems
 
-> Дата создания: 2025-11-27
+> Created: 2025-11-27
 
-## Обзор
+## Overview
 
-Fastlane — это open-source инструмент автоматизации для iOS и Android разработки, который упрощает процессы сборки, тестирования и релиза приложений. Несмотря на широкое распространение, у него есть ряд фундаментальных архитектурных и технических проблем.
+Fastlane is an open-source automation tool for iOS and Android development that simplifies building, testing, and releasing apps. Despite its widespread adoption, it has several fundamental architectural and technical problems.
 
 ---
 
-## 1. Зависимость от приватных API Apple (Spaceship)
+## 1. Dependency on Private Apple APIs (Spaceship)
 
-**Это главная архитектурная проблема fastlane.**
+**This is Fastlane's main architectural problem.**
 
-Исторически Spaceship (ядро fastlane для взаимодействия с Apple) использовал недокументированные приватные API Apple:
+Historically, Spaceship (Fastlane's core for interacting with Apple) used undocumented private Apple APIs:
 
-### Проблемы:
+### Problems:
 
-- **Частые поломки**: Apple периодически меняет эти API без предупреждения. В 2019 году произошла крупная поломка, когда Apple удалила endpoints, которые использовал fastlane
-- **Непредсказуемость**: Пользователи сообщают, что функциональность может перестать работать внезапно — "работало два дня назад, сегодня не работает"
-- **Незавершённая миграция**: С 2018 года (после анонса официального App Store Connect API) идёт постепенная миграция, но она до сих пор не завершена
+- **Frequent breakages**: Apple periodically changes these APIs without notice. In 2019, a major breakage occurred when Apple removed endpoints that Fastlane was using
+- **Unpredictability**: Users report that functionality can stop working suddenly — "worked two days ago, doesn't work today"
+- **Incomplete migration**: Since 2018 (after the official App Store Connect API announcement), gradual migration has been underway, but it's still not complete
 
-### Текущий статус:
+### Current Status:
 
-Fastlane 3.0 планирует полностью перейти на официальный App Store Connect API и использовать кодогенерацию из OpenAPI спецификации.
+Fastlane 3.0 plans to fully transition to the official App Store Connect API and use code generation from OpenAPI specifications.
 
-### Источники:
+### Sources:
 - [Error 410 Gone Issue #14572](https://github.com/fastlane/fastlane/issues/14572)
 - [Fastlane 3.0 Discussion #20463](https://github.com/fastlane/fastlane/discussions/20463)
 - [SPACESHIP_SKIP_2FA_UPGRADE Issue #21301](https://github.com/fastlane/fastlane/issues/21301)
 
 ---
 
-## 2. Ruby как технологический выбор
+## 2. Ruby as a Technology Choice
 
-Ruby создаёт множество проблем для пользователей iOS/Android разработки:
+Ruby creates numerous problems for iOS/Android developers:
 
-### Конфликты версий
+### Version Conflicts
 
-- Постоянные проблемы между системным Ruby, Homebrew Ruby, RVM, rbenv
-- Пользователи регулярно сталкиваются с ошибками несовместимости версий
+- Constant issues between system Ruby, Homebrew Ruby, RVM, rbenv
+- Users regularly encounter version incompatibility errors
 
-### Устаревание gems
+### Deprecated Gems
 
-В Ruby 3.4+ gems `mutex_m` и `abbrev` больше не включены по умолчанию, что ломает fastlane. В Ruby 3.5+ `ostruct` также будет удалён из стандартной библиотеки.
+In Ruby 3.4+, gems `mutex_m` and `abbrev` are no longer included by default, breaking Fastlane. In Ruby 3.5+, `ostruct` will also be removed from the standard library.
 
-### Сложность настройки окружения
+### Environment Setup Complexity
 
-- Требуется Bundler и Gemfile
-- Правильная настройка PATH
+- Requires Bundler and Gemfile
+- Proper PATH configuration
 - UTF-8 locale (`LC_ALL`, `LANG`)
-- Много точек отказа
+- Many points of failure
 
-### Чуждая экосистема
+### Foreign Ecosystem
 
-Swift/Objective-C разработчики вынуждены разбираться в Ruby-экосистеме, что создаёт дополнительный барьер входа.
+Swift/Objective-C developers are forced to understand the Ruby ecosystem, creating an additional barrier to entry.
 
-### Рекомендации fastlane:
+### Fastlane Recommendations:
 
 ```ruby
 # Gemfile
@@ -65,28 +65,28 @@ plugins_path = File.join(File.dirname(__FILE__), 'fastlane', 'Pluginfile')
 eval_gemfile(plugins_path) if File.exist?(plugins_path)
 ```
 
-### Источники:
+### Sources:
 - [Ruby Version Problems Issue #16790](https://github.com/fastlane/fastlane/issues/16790)
 - [Ruby 3.0 Support Plan Issue #17931](https://github.com/fastlane/fastlane/issues/17931)
 - [Buildkite Fastlane Troubleshooting](https://buildkite.com/docs/pipelines/hosted-agents/mobile-delivery-cloud/troubleshooting-fastlane)
 
 ---
 
-## 3. Code Signing остаётся сложным
+## 3. Code Signing Remains Complex
 
-Несмотря на то, что `match` упрощает процесс управления сертификатами, code signing остаётся проблемной областью:
+Despite `match` simplifying certificate management, code signing remains a problematic area:
 
-### Сложности match:
+### Match Complexity:
 
-- Требует отдельного Git-репозитория (или Google Cloud/S3) для хранения сертификатов
-- Сложная начальная настройка
-- Необходимость синхронизации между разработчиками и CI
+- Requires a separate Git repository (or Google Cloud/S3) for certificate storage
+- Complex initial setup
+- Need to synchronize between developers and CI
 
-### Сравнение с альтернативами:
+### Comparison with Alternatives:
 
-Xcode Cloud решает code signing "из коробки" с автоматическим signing — в стиле Apple, "it just works".
+Xcode Cloud solves code signing "out of the box" with automatic signing — in Apple's style, "it just works".
 
-### Пример использования match:
+### Example Match Usage:
 
 ```ruby
 lane :beta do
@@ -95,69 +95,69 @@ lane :beta do
 end
 ```
 
-### Источники:
+### Sources:
 - [Code Signing Troubleshooting](https://docs.fastlane.tools/codesigning/troubleshooting/)
 - [Common Code Signing Issues](https://docs.fastlane.tools/codesigning/common-issues/)
 - [Thoughts on Xcode Cloud](https://www.oliverbinns.co.uk/posts/xcode-cloud-thoughts/)
 
 ---
 
-## 4. Режим поддержки (Maintenance Mode)
+## 4. Maintenance Mode
 
-Fastlane ощущается как проект в режиме поддержки:
+Fastlane feels like a project in maintenance mode:
 
-### Признаки:
+### Signs:
 
-- **Устаревшая документация**: ссылки на Xcode 7-8, хотя актуальная версия — Xcode 15+
-- **Накопление багов**: мелкие баги не исправляются годами
-- **Замедление развития**: после приобретения Google (2017) и последующей передачи в open-source community активность снизилась
+- **Outdated documentation**: references to Xcode 7-8, while the current version is Xcode 15+
+- **Bug accumulation**: minor bugs go unfixed for years
+- **Slowed development**: after Google's acquisition (2017) and subsequent transfer to the open-source community, activity has decreased
 
-### История:
+### History:
 
-- 2015: Создание fastlane
-- 2017: Приобретение Google/Fabric
-- 2019: Передача в open-source community
-- 2021-2024: Режим поддержки, медленная миграция на официальные API
+- 2015: Fastlane creation
+- 2017: Acquired by Google/Fabric
+- 2019: Transferred to open-source community
+- 2021-2024: Maintenance mode, slow migration to official APIs
 
-### Источники:
+### Sources:
 - [Fastlane for Indies (2024)](https://www.jessesquires.com/blog/2024/01/22/fastlane-for-indies/)
 
 ---
 
-## 5. Ограниченный scope
+## 5. Limited Scope
 
-Fastlane фокусируется только на release automation:
+Fastlane focuses only on release automation:
 
-### Что fastlane НЕ делает:
+### What Fastlane Does NOT Do:
 
-- Управление инфраструктурой
-- Полноценный CI/CD pipeline
-- Continuous Integration (только CD)
-- Мониторинг и алертинг
+- Infrastructure management
+- Full CI/CD pipeline
+- Continuous Integration (only CD)
+- Monitoring and alerting
 
-### Требуется интеграция:
+### Integration Required:
 
-Для полноценного CI/CD необходима интеграция с внешними системами:
+For a complete CI/CD, integration with external systems is necessary:
 - Jenkins
 - GitHub Actions
 - GitLab CI
 - Bitrise
 - CircleCI
 
-### Источники:
+### Sources:
 - [Comparing Mobile CI/CD Providers](https://www.runway.team/blog/comparing-the-top-10-mobile-ci-cd-providers)
 
 ---
 
-## 6. Проблемы с двухфакторной аутентификацией (2FA)
+## 6. Two-Factor Authentication (2FA) Issues
 
-### Текущая ситуация:
+### Current Situation:
 
-- Apple требует 2FA для всех аккаунтов разработчиков
-- `fastlane spaceauth` создаёт временные сессии, которые истекают
-- На CI это требует ручного обновления или использования API Key
+- Apple requires 2FA for all developer accounts
+- `fastlane spaceauth` creates temporary sessions that expire
+- On CI, this requires manual updates or using an API Key
 
-### Решение — API Key:
+### Solution — API Key:
 
 ```ruby
 app_store_connect_api_key(
@@ -167,58 +167,58 @@ app_store_connect_api_key(
 )
 ```
 
-Использование API key устраняет необходимость борьбы с 2FA на CI машинах.
+Using an API key eliminates the need to deal with 2FA on CI machines.
 
-### Источники:
+### Sources:
 - [2FA with Fastlane - Stack Overflow](https://stackoverflow.com/questions/63508108/two-factor-authentication-with-fastlane)
 
 ---
 
-## 7. Сравнение с альтернативами
+## 7. Comparison with Alternatives
 
-| Аспект | Fastlane | Xcode Cloud | GitHub Actions |
+| Aspect | Fastlane | Xcode Cloud | GitHub Actions |
 |--------|----------|-------------|----------------|
-| **Code Signing** | Сложный (match) | "Just works" | Требует fastlane |
-| **Стоимость** | Бесплатный | $50/100 часов | $4.80/час Mac runner |
-| **Кастомизация** | Высокая | Ограниченная | Высокая |
-| **Настройка** | Сложная | Простая | Средняя |
-| **Зависимости** | Ruby, gems | Нет | YAML workflows |
-| **Поддержка Android** | Да | Нет | Да |
-| **Уведомления** | Slack, email, custom | Slack, email | Любые |
+| **Code Signing** | Complex (match) | "Just works" | Requires fastlane |
+| **Cost** | Free | $50/100 hours | $4.80/hour Mac runner |
+| **Customization** | High | Limited | High |
+| **Setup** | Complex | Simple | Medium |
+| **Dependencies** | Ruby, gems | None | YAML workflows |
+| **Android Support** | Yes | No | Yes |
+| **Notifications** | Slack, email, custom | Slack, email | Any |
 
-### Когда использовать fastlane:
+### When to Use Fastlane:
 
-- Кросс-платформенные проекты (iOS + Android)
-- Сложные кастомные workflows
-- Интеграция с существующими CI системами
-- Ограниченный бюджет
+- Cross-platform projects (iOS + Android)
+- Complex custom workflows
+- Integration with existing CI systems
+- Limited budget
 
-### Когда рассмотреть альтернативы:
+### When to Consider Alternatives:
 
-- **Xcode Cloud**: Solo разработчики, маленькие iOS-only команды
-- **GitHub Actions**: Open-source проекты, уже используете GitHub
-- **Bitrise**: Нужен UI для настройки, mobile-first подход
+- **Xcode Cloud**: Solo developers, small iOS-only teams
+- **GitHub Actions**: Open-source projects, already using GitHub
+- **Bitrise**: Need UI for setup, mobile-first approach
 
 ---
 
-## 8. Рекомендации по работе с fastlane
+## 8. Recommendations for Working with Fastlane
 
-### Минимизация проблем:
+### Minimizing Problems:
 
-1. **Используйте API Key** вместо Apple ID аутентификации
-2. **Bundler обязателен**: `bundle exec fastlane ...`
-3. **Фиксируйте версии** в Gemfile.lock
-4. **readonly mode на CI**: `match(readonly: true)`
-5. **Verbose mode для отладки**: `fastlane [lane] --verbose`
+1. **Use API Key** instead of Apple ID authentication
+2. **Bundler is mandatory**: `bundle exec fastlane ...`
+3. **Pin versions** in Gemfile.lock
+4. **readonly mode on CI**: `match(readonly: true)`
+5. **Verbose mode for debugging**: `fastlane [lane] --verbose`
 
-### Пример Gemfile:
+### Example Gemfile:
 
 ```ruby
 source "https://rubygems.org"
 
 gem "fastlane", "~> 2.220"
 
-# Для Ruby 3.4+
+# For Ruby 3.4+
 gem "mutex_m"
 gem "abbrev"
 
@@ -228,20 +228,20 @@ eval_gemfile(plugins_path) if File.exist?(plugins_path)
 
 ---
 
-## 9. Выводы для проекта Swiftlane
+## 9. Conclusions for Swiftlane Project
 
-Анализ проблем fastlane показывает ключевые области, которые Swiftlane может улучшить:
+Analysis of Fastlane's problems reveals key areas that Swiftlane can improve:
 
-1. **Нативный Swift**: Устранение Ruby-зависимости, понятный iOS разработчикам
-2. **Официальные API**: Использование только App Store Connect API с самого начала
-3. **Простой code signing**: Минимизация конфигурации для типичных сценариев
-4. **Type safety**: Ошибки на этапе компиляции, а не runtime
-5. **Современная архитектура**: async/await, Swift Concurrency
-6. **Интеграция с экосистемой**: SPM, Xcode, Swift Package plugins
+1. **Native Swift**: Eliminates Ruby dependency, understandable to iOS developers
+2. **Official APIs**: Uses only App Store Connect API from the start
+3. **Simple code signing**: Minimizes configuration for typical scenarios
+4. **Type safety**: Errors at compile time, not runtime
+5. **Modern architecture**: async/await, Swift Concurrency
+6. **Ecosystem integration**: SPM, Xcode, Swift Package plugins
 
 ---
 
-## Источники
+## Sources
 
 - [Fastlane GitHub Issues](https://github.com/fastlane/fastlane/issues)
 - [Fastlane 3.0 Discussion](https://github.com/fastlane/fastlane/discussions/20463)

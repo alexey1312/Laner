@@ -55,6 +55,16 @@ Keep `CLAUDE.md` up-to-date when making significant changes:
 - Change key dependencies
 - Add important conventions
 
+## Maintaining Bilingual Instructions
+
+The `README.md` contains usage instructions in both English and Russian. When updating documentation:
+- **Keep both language versions in sync** — update Russian and English sections together
+- Update command examples in both languages
+- Add new features to both instruction sets
+- Ensure troubleshooting sections match in both languages
+
+Note: Russian text should only exist in the bilingual README instructions section. All other documentation (docs/, CLAUDE.md, code comments) must be in English only.
+
 ## ROADMAP Maintenance
 
 When completing tasks from `ROADMAP.md`:
