@@ -137,30 +137,58 @@ public actor ManifestCompiler {
 
     /// Gets the Laner installation path for dependency resolution.
     ///
-    /// This method determines where the Laner package is installed by:
-    /// 1. Finding the path to the `laner` executable
-    /// 2. Resolving symlinks to get the actual binary location
-    /// 3. Navigating up to the package root (../../..)
+    /// This method determines where the Laner package is installed by checking multiple locations:
+    /// 1. Bundled installation: `<install>/bin/laner` with sources at `<install>/lib/laner/`
+    /// 2. Development build: `<package-root>/.build/release/laner`
+    /// 3. Current directory: For local development
     ///
     /// The path is used to reference LanerDSL in the generated Package.swift.
     ///
-    /// - Returns: The URL to the Laner package root directory.
-    /// - Throws: `ManifestError.installPathNotFound` if the path cannot be determined.
+    /// - Returns: The URL to the Laner package root directory (containing Package.swift and Sources/).
+    /// - Throws: `ManifestError.installPathNotFound` if the path cannot be determined,
+    ///           or `ManifestError.versionMismatch` if bundled version doesn't match binary.
     public func lanerInstallPath() throws -> URL {
-        // First, try to find the laner executable in PATH
-        if let executablePath = fileManager.findExecutable("laner") {
-            let executableURL = URL(fileURLWithPath: executablePath)
+        // Try multiple strategies to find the laner installation
 
-            // Resolve symlinks to get the actual binary location
-            let resolvedURL: URL
-            do {
-                resolvedURL = try fileManager.destinationOfSymbolicLink(atPath: executableURL.path)
-                    .isEmpty ? executableURL : URL(fileURLWithPath: try fileManager.destinationOfSymbolicLink(atPath: executableURL.path))
-            } catch {
-                resolvedURL = executableURL
+        // Get candidate executable paths
+        var executablePaths: [String] = []
+
+        // Strategy 0: Current executable path (most reliable for bundled installs)
+        let currentExecutable = CommandLine.arguments[0]
+        if currentExecutable.hasPrefix("/") {
+            executablePaths.append(currentExecutable)
+        } else {
+            // Relative path - resolve against current directory
+            let absolutePath = URL(fileURLWithPath: fileManager.currentDirectoryPath)
+                .appendingPathComponent(currentExecutable).path
+            executablePaths.append(absolutePath)
+        }
+
+        // Strategy 1: Find via PATH
+        if let pathExecutable = fileManager.findExecutable("laner") {
+            executablePaths.append(pathExecutable)
+        }
+
+        // Try each executable path
+        for executablePath in executablePaths {
+            let executableURL = URL(fileURLWithPath: executablePath)
+            let resolvedURL = resolveSymlinks(executableURL)
+
+            // Check for bundled installation
+            // Structure: <install>/bin/laner with sources at <install>/lib/laner/
+            let binDir = resolvedURL.deletingLastPathComponent()
+            let installDir = binDir.deletingLastPathComponent()
+            let libPath = installDir.appendingPathComponent("lib/laner")
+            let bundledPackage = libPath.appendingPathComponent("Package.swift")
+
+            var isDir: ObjCBool = false
+            if fileManager.fileExists(atPath: bundledPackage.path, isDirectory: &isDir), !isDir.boolValue {
+                // Validate version matches
+                try validateBundledVersion(at: installDir)
+                return libPath
             }
 
-            // Navigate up to the package root
+            // Check for development build
             // Expected structure: <package-root>/.build/release/laner
             // So we go up 3 levels: ../../..
             let packageRoot = resolvedURL
@@ -168,26 +196,58 @@ public actor ManifestCompiler {
                 .deletingLastPathComponent() // .build
                 .deletingLastPathComponent() // package root
 
-            // Verify that Package.swift exists at this location
-            let packageSwiftPath = packageRoot.appendingPathComponent("Package.swift")
-            var isDirectory: ObjCBool = false
-            if fileManager.fileExists(atPath: packageSwiftPath.path, isDirectory: &isDirectory),
-               !isDirectory.boolValue {
+            let devPackage = packageRoot.appendingPathComponent("Package.swift")
+            if fileManager.fileExists(atPath: devPackage.path, isDirectory: &isDir), !isDir.boolValue {
                 return packageRoot
             }
         }
 
-        // If we can't find it via the executable, try the current working directory
-        // This is useful during development
+        // Strategy 2: Current directory (development mode)
         let currentDir = URL(fileURLWithPath: fileManager.currentDirectoryPath)
         let packageSwiftPath = currentDir.appendingPathComponent("Package.swift")
-        var isDirectory: ObjCBool = false
-        if fileManager.fileExists(atPath: packageSwiftPath.path, isDirectory: &isDirectory),
-           !isDirectory.boolValue {
+        var isDir: ObjCBool = false
+        if fileManager.fileExists(atPath: packageSwiftPath.path, isDirectory: &isDir), !isDir.boolValue {
             return currentDir
         }
 
         throw ManifestError.installPathNotFound
+    }
+
+    /// Resolves symlinks to get the actual file location.
+    /// - Parameter url: The URL that may be a symlink.
+    /// - Returns: The resolved URL, or the original URL if not a symlink.
+    private func resolveSymlinks(_ url: URL) -> URL {
+        do {
+            let destination = try fileManager.destinationOfSymbolicLink(atPath: url.path)
+            if destination.isEmpty {
+                return url
+            }
+            // Handle relative symlinks
+            if destination.hasPrefix("/") {
+                return URL(fileURLWithPath: destination)
+            } else {
+                return url.deletingLastPathComponent().appendingPathComponent(destination)
+            }
+        } catch {
+            return url
+        }
+    }
+
+    /// Validates that the bundled DSL version matches the binary version.
+    /// - Parameter installDir: The installation directory containing the VERSION file.
+    /// - Throws: `ManifestError.versionMismatch` if versions don't match.
+    private func validateBundledVersion(at installDir: URL) throws {
+        let versionFile = installDir.appendingPathComponent("VERSION")
+
+        guard let bundledVersion = try? String(contentsOf: versionFile, encoding: .utf8)
+            .trimmingCharacters(in: .whitespacesAndNewlines) else {
+            // No VERSION file found - skip validation for backwards compatibility
+            return
+        }
+
+        guard bundledVersion == lanerVersion else {
+            throw ManifestError.versionMismatch(expected: lanerVersion, found: bundledVersion)
+        }
     }
 
     // MARK: - Code Generation

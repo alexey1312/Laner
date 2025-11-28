@@ -66,6 +66,12 @@ public struct LaneCommand: AsyncParsableCommand {
                 throw ExitCode.failure
             case .installPathNotFound:
                 print("Error: Could not determine Laner installation path")
+                print("Ensure Laner is properly installed with lib/laner/ directory.")
+                throw ExitCode.failure
+            case .versionMismatch(let expected, let found):
+                print("Error: DSL version mismatch")
+                print("Binary version: \(expected), bundled DSL version: \(found)")
+                print("Please reinstall Laner to fix this issue.")
                 throw ExitCode.failure
             }
         }

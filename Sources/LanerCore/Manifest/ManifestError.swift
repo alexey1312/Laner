@@ -16,6 +16,9 @@ public enum ManifestError: Error, Sendable, Equatable {
 
     /// The Laner installation path could not be determined.
     case installPathNotFound
+
+    /// The bundled DSL version does not match the binary version.
+    case versionMismatch(expected: String, found: String)
 }
 
 extension ManifestError: CustomStringConvertible {
@@ -31,6 +34,8 @@ extension ManifestError: CustomStringConvertible {
             return "Invalid manifest output: \(details)"
         case .installPathNotFound:
             return "Could not determine Laner installation path"
+        case .versionMismatch(let expected, let found):
+            return "DSL version mismatch: expected \(expected), found \(found)"
         }
     }
 }

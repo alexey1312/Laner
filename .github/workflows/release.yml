@@ -57,8 +57,71 @@ jobs:
 
       - name: Create release archive
         run: |
+          VERSION="${{ github.ref_name }}"
+          VERSION="${VERSION#v}"
+
+          # Create directory structure
+          mkdir -p release-package/bin
+          mkdir -p release-package/lib/laner/Sources
+
+          # Copy binary
+          cp .build/${{ matrix.build-path }}/laner release-package/bin/
+
+          # Copy DSL sources (required for manifest compilation)
+          cp -r Sources/LanerDSL release-package/lib/laner/Sources/
+          cp -r Sources/LanerKit release-package/lib/laner/Sources/
+          cp -r Sources/LanerMatch release-package/lib/laner/Sources/
+
+          # Create bundled Package.swift for manifest compilation
+          cat > release-package/lib/laner/Package.swift << 'PACKAGE_EOF'
+          // swift-tools-version:6.0
+          import PackageDescription
+
+          let package = Package(
+              name: "Laner",
+              platforms: [.macOS(.v13)],
+              products: [
+                  .library(name: "LanerDSL", targets: ["LanerDSL"]),
+              ],
+              dependencies: [
+                  .package(url: "https://github.com/apple/swift-log", from: "1.5.0"),
+                  .package(url: "https://github.com/apple/swift-crypto", from: "3.0.0"),
+                  .package(url: "https://github.com/swift-server/async-http-client", from: "1.20.0"),
+              ],
+              targets: [
+                  .target(
+                      name: "LanerDSL",
+                      dependencies: [
+                          "LanerKit",
+                          "LanerMatch",
+                          .product(name: "Logging", package: "swift-log"),
+                      ]
+                  ),
+                  .target(
+                      name: "LanerKit",
+                      dependencies: [
+                          .product(name: "Logging", package: "swift-log"),
+                      ]
+                  ),
+                  .target(
+                      name: "LanerMatch",
+                      dependencies: [
+                          "LanerKit",
+                          .product(name: "Logging", package: "swift-log"),
+                          .product(name: "Crypto", package: "swift-crypto"),
+                          .product(name: "AsyncHTTPClient", package: "async-http-client"),
+                      ]
+                  ),
+              ]
+          )
+          PACKAGE_EOF
+
+          # Create VERSION file for version validation
+          echo "$VERSION" > release-package/VERSION
+
+          # Create archive with new structure
           tar -czf Laner-${{ github.ref_name }}-${{ matrix.platform }}.tar.gz \
-            -C .build/${{ matrix.build-path }} laner
+            -C release-package .
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
