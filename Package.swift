@@ -6,13 +6,13 @@ import PackageDescription
 // LanerMatch is excluded due to unavoidable SecKeychain deprecation warnings
 // Usage: LANER_STRICT=1 swift build
 let warningsAsErrors: [SwiftSetting] = [
-    .unsafeFlags(["-warnings-as-errors"])
+    .unsafeFlags(["-warnings-as-errors"]),
 ]
 
 let package = Package(
     name: "Laner",
     platforms: [
-        .macOS(.v13)
+        .macOS(.v13),
     ],
     products: [
         .executable(name: "laner", targets: ["laner"]),
@@ -94,7 +94,7 @@ let package = Package(
             swiftSettings: [
                 // Suppress deprecation warnings for SecKeychain APIs which are deprecated
                 // but have no modern replacement for CI/CD code signing workflows
-                .unsafeFlags(["-suppress-warnings"], .when(platforms: [.macOS]))
+                .unsafeFlags(["-suppress-warnings"], .when(platforms: [.macOS])),
             ]
         ),
 

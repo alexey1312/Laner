@@ -1,6 +1,6 @@
-import Testing
 import Foundation
 @testable import LanerDSL
+import Testing
 
 /// Tests for DSL action functions (gym, scan, archive)
 @Suite("DSL Action Functions Tests")

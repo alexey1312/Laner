@@ -1,9 +1,9 @@
-import Foundation
 import AsyncHTTPClient
+import Crypto
+import Foundation
+import Logging
 import NIOCore
 import NIOHTTP1
-import Logging
-import Crypto
 
 /// Actor responsible for chunked file uploads to App Store Connect.
 ///
@@ -30,9 +30,9 @@ public actor ChunkedUploader {
         chunkSize: Int = ChunkedUploader.defaultChunkSize
     ) {
         self.api = api
-        self.httpClient = HTTPClient(eventLoopGroupProvider: .singleton)
+        httpClient = HTTPClient(eventLoopGroupProvider: .singleton)
         self.chunkSize = chunkSize
-        self.logger = Logger(label: "com.laner.match.uploader")
+        logger = Logger(label: "com.laner.match.uploader")
     }
 
     /// Shuts down the HTTP client.
@@ -55,7 +55,8 @@ public actor ChunkedUploader {
         let fileManager = FileManager.default
         var isDirectory: ObjCBool = false
         guard fileManager.fileExists(atPath: ipaPath, isDirectory: &isDirectory),
-              !isDirectory.boolValue else {
+              !isDirectory.boolValue
+        else {
             throw TestFlightError.ipaNotFound(ipaPath)
         }
 
@@ -170,7 +171,7 @@ public actor ChunkedUploader {
     ) async throws {
         var lastError: Error?
 
-        for attempt in 0..<Self.maxRetries {
+        for attempt in 0 ..< Self.maxRetries {
             do {
                 try await uploadChunk(data: data, uploadUrl: uploadUrl, checksum: checksum)
                 return

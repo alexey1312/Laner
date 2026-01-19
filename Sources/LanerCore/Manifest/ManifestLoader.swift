@@ -1,6 +1,6 @@
 import Foundation
-import LanerKit
 import LanerDSL
+import LanerKit
 import Logging
 
 /// Loads and manages Lanerfile manifests.
@@ -81,7 +81,8 @@ public struct ManifestLoader: Sendable {
             let manifestPath = try findManifestPath(in: directory)
             let fileManager = FileManager.default
             var isDirectory: ObjCBool = false
-            return fileManager.fileExists(atPath: manifestPath.path, isDirectory: &isDirectory) && !isDirectory.boolValue
+            return fileManager.fileExists(atPath: manifestPath.path, isDirectory: &isDirectory) && !isDirectory
+                .boolValue
         } catch {
             return false
         }
@@ -99,7 +100,8 @@ public struct ManifestLoader: Sendable {
         let fileManager = FileManager.default
         var isDirectory: ObjCBool = false
         guard fileManager.fileExists(atPath: manifestURL.path, isDirectory: &isDirectory),
-              !isDirectory.boolValue else {
+              !isDirectory.boolValue
+        else {
             throw ManifestError.notFound(path: manifestURL)
         }
 
@@ -376,7 +378,8 @@ public struct ManifestLoader: Sendable {
 
             var isDirectory: ObjCBool = false
             if fileManager.fileExists(atPath: bundledPackage.path, isDirectory: &isDirectory),
-               !isDirectory.boolValue {
+               !isDirectory.boolValue
+            {
                 return libPath
             }
 
@@ -389,7 +392,8 @@ public struct ManifestLoader: Sendable {
 
             let devPackage = packageRoot.appendingPathComponent("Package.swift")
             if fileManager.fileExists(atPath: devPackage.path, isDirectory: &isDirectory),
-               !isDirectory.boolValue {
+               !isDirectory.boolValue
+            {
                 return packageRoot
             }
         }
@@ -399,7 +403,8 @@ public struct ManifestLoader: Sendable {
         let packageSwiftPath = currentDir.appendingPathComponent("Package.swift")
         var isDir: ObjCBool = false
         if fileManager.fileExists(atPath: packageSwiftPath.path, isDirectory: &isDir),
-           !isDir.boolValue {
+           !isDir.boolValue
+        {
             return currentDir
         }
 

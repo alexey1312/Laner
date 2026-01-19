@@ -11,9 +11,9 @@ public enum CertificateType: String, Sendable, CaseIterable, Codable {
     public var storagePath: String {
         switch self {
         case .development:
-            return "certs/development"
+            "certs/development"
         case .distribution, .adhoc, .appstore:
-            return "certs/distribution"
+            "certs/distribution"
         }
     }
 
@@ -21,13 +21,13 @@ public enum CertificateType: String, Sendable, CaseIterable, Codable {
     public var profilePath: String {
         switch self {
         case .development:
-            return "profiles/development"
+            "profiles/development"
         case .distribution:
-            return "profiles/distribution"
+            "profiles/distribution"
         case .adhoc:
-            return "profiles/adhoc"
+            "profiles/adhoc"
         case .appstore:
-            return "profiles/appstore"
+            "profiles/appstore"
         }
     }
 
@@ -35,9 +35,9 @@ public enum CertificateType: String, Sendable, CaseIterable, Codable {
     public var appleType: String {
         switch self {
         case .development:
-            return "IOS_DEVELOPMENT"
+            "IOS_DEVELOPMENT"
         case .distribution, .adhoc, .appstore:
-            return "IOS_DISTRIBUTION"
+            "IOS_DISTRIBUTION"
         }
     }
 
@@ -45,13 +45,13 @@ public enum CertificateType: String, Sendable, CaseIterable, Codable {
     public var profileType: String {
         switch self {
         case .development:
-            return "IOS_APP_DEVELOPMENT"
+            "IOS_APP_DEVELOPMENT"
         case .distribution:
-            return "IOS_APP_STORE"
+            "IOS_APP_STORE"
         case .adhoc:
-            return "IOS_APP_ADHOC"
+            "IOS_APP_ADHOC"
         case .appstore:
-            return "IOS_APP_STORE"
+            "IOS_APP_STORE"
         }
     }
 }

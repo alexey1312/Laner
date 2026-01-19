@@ -1,14 +1,13 @@
-import Testing
 import Foundation
 @testable import LanerMatch
+import Testing
 
 @Suite("TestFlight Model Tests")
 struct TestFlightModelsTests {
-
     // MARK: - Build Tests
 
     @Test("Build decodes from JSON correctly")
-    func testBuildDecoding() throws {
+    func buildDecoding() throws {
         let json = """
         {
             "id": "build-123",
@@ -35,7 +34,7 @@ struct TestFlightModelsTests {
     }
 
     @Test("Build processing state decodes all valid states")
-    func testBuildProcessingStateDecoding() throws {
+    func buildProcessingStateDecoding() throws {
         let states = ["PROCESSING", "FAILED", "INVALID", "VALID"]
         let expected: [Build.ProcessingState] = [.processing, .failed, .invalid, .valid]
 
@@ -47,14 +46,14 @@ struct TestFlightModelsTests {
     }
 
     @Test("Build processing state decodes unknown states")
-    func testBuildProcessingStateUnknown() throws {
+    func buildProcessingStateUnknown() throws {
         let json = "\"FUTURE_STATE\""
         let state = try JSONDecoder().decode(Build.ProcessingState.self, from: json.data(using: .utf8)!)
         #expect(state == .unknown)
     }
 
     @Test("Build equality check works")
-    func testBuildEquality() {
+    func buildEquality() {
         let build1 = Build(id: "123", version: "42", processingState: .valid)
         let build2 = Build(id: "123", version: "42", processingState: .valid)
         let build3 = Build(id: "456", version: "42", processingState: .valid)
@@ -66,7 +65,7 @@ struct TestFlightModelsTests {
     // MARK: - BuildUpload Tests
 
     @Test("BuildUpload decodes from JSON correctly")
-    func testBuildUploadDecoding() throws {
+    func buildUploadDecoding() throws {
         let json = """
         {
             "id": "upload-123",
@@ -81,7 +80,7 @@ struct TestFlightModelsTests {
     }
 
     @Test("BuildUpload upload state decodes all valid states")
-    func testBuildUploadStateDecoding() throws {
+    func buildUploadStateDecoding() throws {
         let states = ["AWAITING_FILES", "UPLOADING", "COMPLETE", "FAILED"]
         let expected: [BuildUpload.UploadState] = [.awaitingFiles, .uploading, .complete, .failed]
 
@@ -95,7 +94,7 @@ struct TestFlightModelsTests {
     // MARK: - BuildUploadFile Tests
 
     @Test("BuildUploadFile initializes correctly")
-    func testBuildUploadFileInit() {
+    func buildUploadFileInit() {
         let file = BuildUploadFile(
             id: "file-123",
             uploadUrl: "https://s3.amazonaws.com/bucket/file",
@@ -110,7 +109,7 @@ struct TestFlightModelsTests {
     // MARK: - ChunkInfo Tests
 
     @Test("ChunkInfo initializes correctly")
-    func testChunkInfoInit() {
+    func chunkInfoInit() {
         let chunk = ChunkInfo(
             index: 0,
             offset: 0,
@@ -129,7 +128,7 @@ struct TestFlightModelsTests {
     // MARK: - BetaGroup Tests
 
     @Test("BetaGroup decodes from JSON correctly")
-    func testBetaGroupDecoding() throws {
+    func betaGroupDecoding() throws {
         let json = """
         {
             "id": "group-123",
@@ -150,7 +149,7 @@ struct TestFlightModelsTests {
     }
 
     @Test("BetaGroup with public link decodes correctly")
-    func testBetaGroupWithPublicLink() throws {
+    func betaGroupWithPublicLink() throws {
         let json = """
         {
             "id": "group-456",
@@ -171,7 +170,7 @@ struct TestFlightModelsTests {
     // MARK: - UploadProgress Tests
 
     @Test("UploadProgress percentage calculation")
-    func testUploadProgressPercentage() {
+    func uploadProgressPercentage() {
         let progress = UploadProgress(
             bytesUploaded: 50 * 1024 * 1024,
             totalBytes: 100 * 1024 * 1024,
@@ -183,7 +182,7 @@ struct TestFlightModelsTests {
     }
 
     @Test("UploadProgress percentage handles zero total bytes")
-    func testUploadProgressZeroBytes() {
+    func uploadProgressZeroBytes() {
         let progress = UploadProgress(
             bytesUploaded: 0,
             totalBytes: 0,
@@ -195,7 +194,7 @@ struct TestFlightModelsTests {
     }
 
     @Test("UploadProgress 100% complete")
-    func testUploadProgressComplete() {
+    func uploadProgressComplete() {
         let progress = UploadProgress(
             bytesUploaded: 100_000_000,
             totalBytes: 100_000_000,
@@ -209,7 +208,7 @@ struct TestFlightModelsTests {
     // MARK: - TestFlightError Tests
 
     @Test("TestFlightError descriptions are informative")
-    func testTestFlightErrorDescriptions() {
+    func flightErrorDescriptions() {
         let errors: [TestFlightError] = [
             .ipaNotFound("/path/to/app.ipa"),
             .invalidIPA("Not a valid ZIP archive"),
@@ -234,7 +233,7 @@ struct TestFlightModelsTests {
     }
 
     @Test("TestFlightError equality")
-    func testTestFlightErrorEquality() {
+    func flightErrorEquality() {
         let error1 = TestFlightError.ipaNotFound("/path/to/app.ipa")
         let error2 = TestFlightError.ipaNotFound("/path/to/app.ipa")
         let error3 = TestFlightError.ipaNotFound("/different/path.ipa")

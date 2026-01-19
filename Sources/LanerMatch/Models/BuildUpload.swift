@@ -17,9 +17,9 @@ public struct BuildUpload: Codable, Sendable, Equatable {
 
 // MARK: - UploadState
 
-extension BuildUpload {
+public extension BuildUpload {
     /// The state of a build upload session.
-    public enum UploadState: String, Codable, Sendable, Equatable {
+    enum UploadState: String, Codable, Sendable, Equatable {
         /// Upload is awaiting files.
         case awaitingFiles = "AWAITING_FILES"
 

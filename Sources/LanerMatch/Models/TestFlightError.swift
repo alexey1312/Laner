@@ -46,34 +46,34 @@ public enum TestFlightError: Error, LocalizedError, Sendable, Equatable {
 
     public var errorDescription: String? {
         switch self {
-        case .ipaNotFound(let path):
-            return "IPA file not found: \(path)"
-        case .invalidIPA(let reason):
-            return "Invalid IPA file: \(reason)"
-        case .uploadCreationFailed(let reason):
-            return "Failed to create upload session: \(reason)"
-        case .chunkUploadFailed(let index, let reason):
-            return "Failed to upload chunk \(index): \(reason)"
-        case .uploadCompletionFailed(let reason):
-            return "Failed to complete upload: \(reason)"
+        case let .ipaNotFound(path):
+            "IPA file not found: \(path)"
+        case let .invalidIPA(reason):
+            "Invalid IPA file: \(reason)"
+        case let .uploadCreationFailed(reason):
+            "Failed to create upload session: \(reason)"
+        case let .chunkUploadFailed(index, reason):
+            "Failed to upload chunk \(index): \(reason)"
+        case let .uploadCompletionFailed(reason):
+            "Failed to complete upload: \(reason)"
         case .processingTimeout:
-            return "Build processing timed out (30 minutes)"
-        case .processingFailed(let reason):
-            return "Build processing failed: \(reason)"
-        case .groupNotFound(let name):
-            return "Beta group not found: \(name)"
-        case .distributionFailed(let reason):
-            return "Failed to distribute build: \(reason)"
-        case .rateLimited(let retryAfter):
-            return "Rate limited by App Store Connect. Retry after \(retryAfter) seconds."
-        case .apiError(let reason):
-            return "App Store Connect API error: \(reason)"
+            "Build processing timed out (30 minutes)"
+        case let .processingFailed(reason):
+            "Build processing failed: \(reason)"
+        case let .groupNotFound(name):
+            "Beta group not found: \(name)"
+        case let .distributionFailed(reason):
+            "Failed to distribute build: \(reason)"
+        case let .rateLimited(retryAfter):
+            "Rate limited by App Store Connect. Retry after \(retryAfter) seconds."
+        case let .apiError(reason):
+            "App Store Connect API error: \(reason)"
         case .missingAppId:
-            return "App ID is required. Provide via --app-id or APP_STORE_APP_ID environment variable."
-        case .missingCredentials(let missing):
-            return "Missing API credentials: \(missing)"
+            "App ID is required. Provide via --app-id or APP_STORE_APP_ID environment variable."
+        case let .missingCredentials(missing):
+            "Missing API credentials: \(missing)"
         case .platformNotSupported:
-            return "TestFlight upload is only supported on macOS"
+            "TestFlight upload is only supported on macOS"
         }
     }
 }

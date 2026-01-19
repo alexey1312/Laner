@@ -102,82 +102,82 @@ public struct PilotAction: Action {
     @MainActor
     public func execute(context: ExecutionContext) async throws -> PilotResult {
         #if !os(macOS)
-        throw TestFlightError.platformNotSupported
+            throw TestFlightError.platformNotSupported
         #else
-        context.logger.info("[\(Self.name)] Starting TestFlight upload")
+            context.logger.info("[\(Self.name)] Starting TestFlight upload")
 
-        // Resolve IPA path
-        let ipaPath = try resolveIPAPath(from: context)
-        context.logger.info("[\(Self.name)]   IPA: \(ipaPath)")
+            // Resolve IPA path
+            let ipaPath = try resolveIPAPath(from: context)
+            context.logger.info("[\(Self.name)]   IPA: \(ipaPath)")
 
-        // Resolve app ID
-        let appId = try resolveAppId(from: context)
-        context.logger.info("[\(Self.name)]   App ID: \(appId)")
+            // Resolve app ID
+            let appId = try resolveAppId(from: context)
+            context.logger.info("[\(Self.name)]   App ID: \(appId)")
 
-        // Resolve API credentials
-        let apiKeyId = try resolveCredential(
-            from: context,
-            key: "APP_STORE_CONNECT_API_KEY_ID"
-        )
-        let apiIssuerId = try resolveCredential(
-            from: context,
-            key: "APP_STORE_CONNECT_API_ISSUER_ID"
-        )
-        let apiKeyPath = try resolveCredential(
-            from: context,
-            key: "APP_STORE_CONNECT_API_KEY_PATH"
-        )
+            // Resolve API credentials
+            let apiKeyId = try resolveCredential(
+                from: context,
+                key: "APP_STORE_CONNECT_API_KEY_ID"
+            )
+            let apiIssuerId = try resolveCredential(
+                from: context,
+                key: "APP_STORE_CONNECT_API_ISSUER_ID"
+            )
+            let apiKeyPath = try resolveCredential(
+                from: context,
+                key: "APP_STORE_CONNECT_API_KEY_PATH"
+            )
 
-        // Log options
-        if let changelog = options.changelog {
-            context.logger.info("[\(Self.name)]   Changelog: \(changelog.prefix(50))...")
-        }
-
-        if let groups = options.groups, !groups.isEmpty {
-            context.logger.info("[\(Self.name)]   Groups: \(groups.joined(separator: ", "))")
-        }
-
-        context.logger.info("[\(Self.name)]   Skip waiting: \(options.skipWaitingForProcessing)")
-
-        // Create API client
-        let api = try AppStoreConnectAPI(
-            keyId: apiKeyId,
-            issuerId: apiIssuerId,
-            privateKeyPath: apiKeyPath
-        )
-
-        defer {
-            Task {
-                try? await api.shutdown()
+            // Log options
+            if let changelog = options.changelog {
+                context.logger.info("[\(Self.name)]   Changelog: \(changelog.prefix(50))...")
             }
-        }
 
-        // Create TestFlight service
-        let service = TestFlightService(api: api)
-
-        // Upload and distribute
-        let build = try await service.uploadAndDistribute(
-            ipaPath: ipaPath,
-            appId: appId,
-            groups: options.groups,
-            whatsNew: options.changelog,
-            skipWaitingForProcessing: options.skipWaitingForProcessing,
-            progress: { progress in
-                let percent = String(format: "%.1f", progress.percentage)
-                let chunks = "\(progress.currentChunk)/\(progress.totalChunks)"
-                print("[pilot]   Upload: \(percent)% (\(chunks) chunks)")
+            if let groups = options.groups, !groups.isEmpty {
+                context.logger.info("[\(Self.name)]   Groups: \(groups.joined(separator: ", "))")
             }
-        )
 
-        context.logger.info("[\(Self.name)] Upload completed successfully")
-        context.logger.info("[\(Self.name)]   Build version: \(build.version)")
-        context.logger.info("[\(Self.name)]   Processing state: \(build.processingState.rawValue)")
+            context.logger.info("[\(Self.name)]   Skip waiting: \(options.skipWaitingForProcessing)")
 
-        return PilotResult(
-            build: build,
-            appId: appId,
-            ipaPath: ipaPath
-        )
+            // Create API client
+            let api = try AppStoreConnectAPI(
+                keyId: apiKeyId,
+                issuerId: apiIssuerId,
+                privateKeyPath: apiKeyPath
+            )
+
+            defer {
+                Task {
+                    try? await api.shutdown()
+                }
+            }
+
+            // Create TestFlight service
+            let service = TestFlightService(api: api)
+
+            // Upload and distribute
+            let build = try await service.uploadAndDistribute(
+                ipaPath: ipaPath,
+                appId: appId,
+                groups: options.groups,
+                whatsNew: options.changelog,
+                skipWaitingForProcessing: options.skipWaitingForProcessing,
+                progress: { progress in
+                    let percent = String(format: "%.1f", progress.percentage)
+                    let chunks = "\(progress.currentChunk)/\(progress.totalChunks)"
+                    print("[pilot]   Upload: \(percent)% (\(chunks) chunks)")
+                }
+            )
+
+            context.logger.info("[\(Self.name)] Upload completed successfully")
+            context.logger.info("[\(Self.name)]   Build version: \(build.version)")
+            context.logger.info("[\(Self.name)]   Processing state: \(build.processingState.rawValue)")
+
+            return PilotResult(
+                build: build,
+                appId: appId,
+                ipaPath: ipaPath
+            )
         #endif
     }
 
@@ -190,7 +190,8 @@ public struct PilotAction: Action {
             let fileManager = FileManager.default
             var isDirectory: ObjCBool = false
             guard fileManager.fileExists(atPath: ipa, isDirectory: &isDirectory),
-                  !isDirectory.boolValue else {
+                  !isDirectory.boolValue
+            else {
                 throw TestFlightError.ipaNotFound(ipa)
             }
             return ipa
@@ -231,7 +232,7 @@ public enum PilotActionError: Error, LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .missingIPA:
-            return "No IPA path provided. Use --ipa option or run gym/archive action first."
+            "No IPA path provided. Use --ipa option or run gym/archive action first."
         }
     }
 }

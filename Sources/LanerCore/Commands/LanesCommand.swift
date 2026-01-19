@@ -1,8 +1,8 @@
 import ArgumentParser
 import Foundation
-import Logging
-import LanerKit
 import LanerDSL
+import LanerKit
+import Logging
 
 /// Lists all available lanes defined in the Lanerfile.
 ///

@@ -26,11 +26,11 @@ public enum LogCategory: String, Sendable, CaseIterable {
     }
 }
 
-extension Logger {
+public extension Logger {
     /// Creates a logger for a specific Laner category.
     /// - Parameter category: The log category.
     /// - Returns: A configured logger for the category.
-    public static func laner(_ category: LogCategory) -> Logger {
+    static func laner(_ category: LogCategory) -> Logger {
         Logger(label: category.label)
     }
 }

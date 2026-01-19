@@ -50,6 +50,7 @@ laner doctor
 ```
 
 This checks:
+
 - Swift version
 - Git version
 - Xcode availability (macOS only)
@@ -105,16 +106,16 @@ laner lane release
 
 ## Core Commands
 
-| Command | Description |
-|---------|-------------|
-| `laner version` | Show Laner version |
-| `laner doctor` | Check environment |
-| `laner init` | Initialize project |
-| `laner lanes` | List available lanes |
-| `laner lane <name>` | Execute a lane |
-| `laner build` | Build project |
-| `laner test` | Run tests |
-| `laner match sync` | Sync certificates |
+| Command                   | Description          |
+| ------------------------- | -------------------- |
+| `laner version`           | Show Laner version   |
+| `laner doctor`            | Check environment    |
+| `laner init`              | Initialize project   |
+| `laner lanes`             | List available lanes |
+| `laner lane <name>`       | Execute a lane       |
+| `laner build`             | Build project        |
+| `laner test`              | Run tests            |
+| `laner match sync`        | Sync certificates    |
 | `laner upload testflight` | Upload to TestFlight |
 
 ## Code Signing Setup (Match)

@@ -28,27 +28,27 @@ public enum CLIError: Error, LocalizedError {
 
     public var errorDescription: String? {
         switch self {
-        case .noProjectFound(let url):
+        case let .noProjectFound(url):
             return "No .xcworkspace or .xcodeproj found in '\(url.path(percentEncoded: false))'"
         case .schemeDiscoveryFailed:
             return "Failed to discover available schemes. Specify --scheme explicitly."
         case .noSchemeFound:
             return "No schemes found in the project. Specify --scheme explicitly."
-        case .buildFailed(let errors):
+        case let .buildFailed(errors):
             if errors.isEmpty {
                 return "Build failed"
             }
             return "Build failed with \(errors.count) error(s)"
-        case .testFailed(let failedTests):
+        case let .testFailed(failedTests):
             if failedTests.isEmpty {
                 return "Tests failed"
             }
             return "\(failedTests.count) test(s) failed"
-        case .invalidArgument(let message):
+        case let .invalidArgument(message):
             return "Invalid argument: \(message)"
-        case .fileNotFound(let path):
+        case let .fileNotFound(path):
             return "File not found: \(path)"
-        case .platformNotSupported(let feature):
+        case let .platformNotSupported(feature):
             return "\(feature) is only available on macOS"
         }
     }

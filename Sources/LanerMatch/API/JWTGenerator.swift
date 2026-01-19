@@ -1,5 +1,5 @@
-import Foundation
 @preconcurrency import Crypto
+import Foundation
 
 /// Generates JWT tokens for App Store Connect API authentication using ES256 (ECDSA P-256)
 public struct JWTGenerator: Sendable {

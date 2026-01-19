@@ -3,6 +3,7 @@
 ## Why
 
 Code signing is the most error-prone and time-consuming part of iOS CI/CD. Teams struggle with:
+
 - Multiple certificates/profiles per developer causing conflicts
 - Manual renewal of expired credentials
 - Onboarding new team members to signing infrastructure

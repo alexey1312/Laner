@@ -41,18 +41,18 @@ public protocol Action: Sendable {
     func execute(context: ExecutionContext) async throws -> Result
 }
 
-extension Action {
+public extension Action {
     /// Default description returns an empty string.
-    public static var description: String { "" }
+    static var description: String { "" }
 }
 
 /// An action that produces no result.
 public protocol VoidAction: Action where Result == Void {}
 
-extension VoidAction {
+public extension VoidAction {
     /// Convenience wrapper that ignores the void result.
     @MainActor
-    public func run(context: ExecutionContext) async throws {
+    func run(context: ExecutionContext) async throws {
         _ = try await execute(context: context)
     }
 }

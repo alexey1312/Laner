@@ -12,8 +12,8 @@ public enum BuildConfiguration: String, Sendable, Codable {
 public enum ExportMethod: String, Sendable, Codable {
     case appStore = "app-store"
     case adHoc = "ad-hoc"
-    case development = "development"
-    case enterprise = "enterprise"
+    case development
+    case enterprise
 }
 
 // MARK: - DSL Functions

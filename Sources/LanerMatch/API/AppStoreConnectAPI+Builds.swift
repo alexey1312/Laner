@@ -1,16 +1,16 @@
-import Foundation
 import AsyncHTTPClient
+import Foundation
+import Logging
 import NIOCore
 import NIOHTTP1
-import Logging
 
 // MARK: - Build Upload API v4.1+
 
-extension AppStoreConnectAPI {
+public extension AppStoreConnectAPI {
     /// Creates a new build upload session.
     /// - Parameter appId: The App Store Connect app ID.
     /// - Returns: The created build upload session.
-    public func createBuildUpload(appId: String) async throws -> BuildUpload {
+    func createBuildUpload(appId: String) async throws -> BuildUpload {
         let requestBody = CreateBuildUploadRequest(
             data: CreateBuildUploadRequest.Data(
                 type: "buildUploads",
@@ -43,7 +43,7 @@ extension AppStoreConnectAPI {
     ///   - buildUploadId: The build upload session ID.
     ///   - chunk: Information about the chunk to upload.
     /// - Returns: The file reservation with upload URL.
-    public func reserveBuildUploadFile(
+    func reserveBuildUploadFile(
         buildUploadId: String,
         chunk: ChunkInfo
     ) async throws -> BuildUploadFile {
@@ -88,7 +88,7 @@ extension AppStoreConnectAPI {
 
     /// Commits an uploaded file chunk.
     /// - Parameter fileId: The file ID to commit.
-    public func commitBuildUploadFile(fileId: String) async throws {
+    func commitBuildUploadFile(fileId: String) async throws {
         let requestBody = CommitBuildUploadFileRequest(
             data: CommitBuildUploadFileRequest.Data(
                 id: fileId,
@@ -109,7 +109,7 @@ extension AppStoreConnectAPI {
 
     /// Completes the build upload session.
     /// - Parameter buildUploadId: The build upload session ID.
-    public func completeBuildUpload(buildUploadId: String) async throws {
+    func completeBuildUpload(buildUploadId: String) async throws {
         let requestBody = CompleteBuildUploadRequest(
             data: CompleteBuildUploadRequest.Data(
                 id: buildUploadId,
@@ -131,13 +131,13 @@ extension AppStoreConnectAPI {
 
 // MARK: - Builds API
 
-extension AppStoreConnectAPI {
+public extension AppStoreConnectAPI {
     /// Lists builds for an app.
     /// - Parameters:
     ///   - appId: The App Store Connect app ID.
     ///   - limit: Maximum number of builds to return (default: 10).
     /// - Returns: Array of builds.
-    public func listBuilds(appId: String, limit: Int = 10) async throws -> [Build] {
+    func listBuilds(appId: String, limit: Int = 10) async throws -> [Build] {
         let path = "/builds?filter[app]=\(appId)&limit=\(limit)&sort=-uploadedDate"
 
         let response: BuildsResponse = try await executeRequest(method: .GET, path: path)
@@ -157,7 +157,7 @@ extension AppStoreConnectAPI {
     /// Gets a specific build by ID.
     /// - Parameter id: The build ID.
     /// - Returns: The build.
-    public func getBuild(id: String) async throws -> Build {
+    func getBuild(id: String) async throws -> Build {
         let response: BuildResponse = try await executeRequest(method: .GET, path: "/builds/\(id)")
         return Build(
             id: response.data.id,

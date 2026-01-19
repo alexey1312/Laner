@@ -13,12 +13,14 @@ iOS developers need to upload builds to TestFlight for beta testing. Fastlane's 
 ### appstore-connect-upload
 
 <!-- DELTA:ADDED -->
+
 - [+] ChunkedUploader actor for Build Upload API v4.1+ with 50MB chunks
 - [+] TestFlightService actor for upload orchestration and beta distribution
 - [+] Build, BuildUpload, BetaGroup, TestFlightError models
 - [+] AppStoreConnectAPI extensions for builds and beta groups
 - [+] pilot() and uploadToTestFlight() DSL actions
 - [+] `laner upload testflight` CLI command
+
 <!-- /DELTA -->
 
 ## Problem Statement

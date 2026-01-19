@@ -1,8 +1,11 @@
 # built-in-actions Specification
 
 ## Purpose
+
 TBD - created by archiving change add-lane-execution. Update Purpose after archive.
+
 ## Requirements
+
 ### Requirement: GymAction for Building
 
 The system SHALL provide GymAction wrapping XcodebuildExecutor.build for project builds.

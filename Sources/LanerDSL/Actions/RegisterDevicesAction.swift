@@ -44,7 +44,7 @@ public struct RegisterDevicesOptions: Sendable {
         apiKeyPath: String? = nil
     ) {
         self.file = file
-        self.devices = nil
+        devices = nil
         self.platform = platform
         self.teamId = teamId
         self.apiKeyId = apiKeyId
@@ -68,7 +68,7 @@ public struct RegisterDevicesOptions: Sendable {
         apiIssuerId: String? = nil,
         apiKeyPath: String? = nil
     ) {
-        self.file = nil
+        file = nil
         self.devices = devices
         self.platform = platform
         self.teamId = teamId
@@ -148,7 +148,9 @@ public struct RegisterDevicesAction: Action {
             throw RegisterDevicesActionError.noDeviceSource
         }
 
-        context.logger.info("[\(Self.name)] Registration complete: \(result.registered.count) new, \(result.existing.count) existing")
+        let newCount = result.registered.count
+        let existingCount = result.existing.count
+        context.logger.info("[\(Self.name)] Registration complete: \(newCount) new, \(existingCount) existing")
 
         return result
     }
@@ -226,15 +228,15 @@ public enum RegisterDevicesActionError: Error, LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .noDeviceSource:
-            return "No device source provided. Must specify either 'file' or 'devices' parameter"
+            "No device source provided. Must specify either 'file' or 'devices' parameter"
         case .missingTeamId:
-            return "Team ID must be provided via options or MATCH_TEAM_ID environment variable"
+            "Team ID must be provided via options or MATCH_TEAM_ID environment variable"
         case .missingApiKeyId:
-            return "API Key ID must be provided via options or APP_STORE_CONNECT_API_KEY_ID environment variable"
+            "API Key ID must be provided via options or APP_STORE_CONNECT_API_KEY_ID environment variable"
         case .missingApiIssuerId:
-            return "API Issuer ID must be provided via options or APP_STORE_CONNECT_API_ISSUER_ID environment variable"
+            "API Issuer ID must be provided via options or APP_STORE_CONNECT_API_ISSUER_ID environment variable"
         case .missingApiKeyPath:
-            return "API Key path must be provided via options or APP_STORE_CONNECT_API_KEY_PATH environment variable"
+            "API Key path must be provided via options or APP_STORE_CONNECT_API_KEY_PATH environment variable"
         }
     }
 }

@@ -19,13 +19,13 @@ public enum Verbosity: Sendable {
     public var logLevel: Logger.Level {
         switch self {
         case .quiet:
-            return .warning
+            .warning
         case .normal:
-            return .info
+            .info
         case .verbose:
-            return .debug
+            .debug
         case .trace:
-            return .trace
+            .trace
         }
     }
 }
@@ -74,7 +74,7 @@ private final class LockedState<T>: @unchecked Sendable {
     private let lock = NSLock()
 
     init(initialState: T) {
-        self._value = initialState
+        _value = initialState
     }
 
     func withLock<R>(_ body: (inout T) -> R) -> R {

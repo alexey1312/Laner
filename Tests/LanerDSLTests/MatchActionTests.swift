@@ -1,12 +1,12 @@
-import Testing
 import Foundation
 @testable import LanerDSL
 @testable import LanerMatch
+import Testing
 
 @Suite("MatchAction Tests")
 struct MatchActionTests {
     @Test("MatchOptions initialization with defaults")
-    func testMatchOptionsDefaults() {
+    func matchOptionsDefaults() {
         let options = MatchOptions(type: .development)
 
         #expect(options.type == .development)
@@ -20,7 +20,7 @@ struct MatchActionTests {
     }
 
     @Test("MatchOptions initialization with custom values")
-    func testMatchOptionsCustomValues() {
+    func matchOptionsCustomValues() {
         let options = MatchOptions(
             type: .appstore,
             readonly: true,
@@ -43,13 +43,13 @@ struct MatchActionTests {
     }
 
     @Test("MatchAction has correct metadata")
-    func testMatchActionMetadata() {
+    func matchActionMetadata() {
         #expect(MatchAction.name == "match")
         #expect(MatchAction.description == "Sync code signing certificates and provisioning profiles")
     }
 
     @Test("MatchAction can be type-erased")
-    func testMatchActionTypeErasure() {
+    func matchActionTypeErasure() {
         let options = MatchOptions(type: .development)
         let action = MatchAction(options: options)
         let anyAction = AnyAction(action)
@@ -59,14 +59,14 @@ struct MatchActionTests {
     }
 
     @Test("match() DSL function creates AnyAction")
-    func testMatchDSLFunction() {
+    func matchDSLFunction() {
         let action = match(type: .adhoc, readonly: true)
 
         #expect(action.name == "match")
     }
 
     @Test("match() DSL function with all parameters")
-    func testMatchDSLFunctionAllParameters() {
+    func matchDSLFunctionAllParameters() {
         let action = match(
             type: .distribution,
             readonly: true,
@@ -82,7 +82,7 @@ struct MatchActionTests {
     }
 
     @Test("MatchActionError descriptions")
-    func testMatchActionErrorDescriptions() {
+    func matchActionErrorDescriptions() {
         let passwordError = MatchActionError.missingPassword
         #expect(passwordError.errorDescription?.contains("MATCH_PASSWORD") == true)
 
@@ -97,7 +97,7 @@ struct MatchActionTests {
 @Suite("RegisterDevicesAction Tests")
 struct RegisterDevicesActionTests {
     @Test("RegisterDevicesOptions initialization with file")
-    func testRegisterDevicesOptionsFile() {
+    func registerDevicesOptionsFile() {
         let options = RegisterDevicesOptions(file: "devices.txt")
 
         #expect(options.file == "devices.txt")
@@ -110,7 +110,7 @@ struct RegisterDevicesActionTests {
     }
 
     @Test("RegisterDevicesOptions initialization with devices dictionary")
-    func testRegisterDevicesOptionsDevices() {
+    func registerDevicesOptionsDevices() {
         let devices = ["iPhone 15": "00008030-001234567890401E"]
         let options = RegisterDevicesOptions(devices: devices, platform: .iOS)
 
@@ -121,7 +121,7 @@ struct RegisterDevicesActionTests {
     }
 
     @Test("RegisterDevicesOptions with custom values")
-    func testRegisterDevicesOptionsCustomValues() {
+    func registerDevicesOptionsCustomValues() {
         let options = RegisterDevicesOptions(
             file: "devices.txt",
             platform: .macOS,
@@ -140,13 +140,13 @@ struct RegisterDevicesActionTests {
     }
 
     @Test("RegisterDevicesAction has correct metadata")
-    func testRegisterDevicesActionMetadata() {
+    func registerDevicesActionMetadata() {
         #expect(RegisterDevicesAction.name == "register_devices")
         #expect(RegisterDevicesAction.description == "Register devices with Apple Developer Portal")
     }
 
     @Test("RegisterDevicesAction can be type-erased")
-    func testRegisterDevicesActionTypeErasure() {
+    func registerDevicesActionTypeErasure() {
         let options = RegisterDevicesOptions(file: "devices.txt")
         let action = RegisterDevicesAction(options: options)
         let anyAction = AnyAction(action)
@@ -156,17 +156,17 @@ struct RegisterDevicesActionTests {
     }
 
     @Test("registerDevices(file:) DSL function creates AnyAction")
-    func testRegisterDevicesDSLFunctionFile() {
+    func registerDevicesDSLFunctionFile() {
         let action = registerDevices(file: "devices.txt")
 
         #expect(action.name == "register_devices")
     }
 
     @Test("registerDevices(devices:) DSL function creates AnyAction")
-    func testRegisterDevicesDSLFunctionDevices() {
+    func registerDevicesDSLFunctionDevices() {
         let devices = [
             "iPhone 15": "00008030-001234567890401E",
-            "iPad Pro": "00008101-000123456789012E"
+            "iPad Pro": "00008101-000123456789012E",
         ]
         let action = registerDevices(devices: devices, platform: .iOS)
 
@@ -174,7 +174,7 @@ struct RegisterDevicesActionTests {
     }
 
     @Test("registerDevices(file:) with all parameters")
-    func testRegisterDevicesDSLFunctionFileAllParameters() {
+    func registerDevicesDSLFunctionFileAllParameters() {
         let action = registerDevices(
             file: "devices.txt",
             platform: .tvOS,
@@ -188,7 +188,7 @@ struct RegisterDevicesActionTests {
     }
 
     @Test("RegisterDevicesActionError descriptions")
-    func testRegisterDevicesActionErrorDescriptions() {
+    func registerDevicesActionErrorDescriptions() {
         let noSourceError = RegisterDevicesActionError.noDeviceSource
         #expect(noSourceError.errorDescription?.contains("No device source") == true)
 
@@ -209,21 +209,21 @@ struct RegisterDevicesActionTests {
 @Suite("Match Integration Tests")
 struct MatchIntegrationTests {
     @Test("MatchOptions is Sendable")
-    func testMatchOptionsIsSendable() {
+    func matchOptionsIsSendable() {
         let options = MatchOptions(type: .development)
         let sendableOptions: any Sendable = options
         #expect(sendableOptions is MatchOptions)
     }
 
     @Test("RegisterDevicesOptions is Sendable")
-    func testRegisterDevicesOptionsIsSendable() {
+    func registerDevicesOptionsIsSendable() {
         let options = RegisterDevicesOptions(file: "devices.txt")
         let sendableOptions: any Sendable = options
         #expect(sendableOptions is RegisterDevicesOptions)
     }
 
     @Test("All CertificateType cases work with MatchOptions")
-    func testAllCertificateTypes() {
+    func allCertificateTypes() {
         let types: [CertificateType] = [.development, .distribution, .adhoc, .appstore]
 
         for type in types {
@@ -233,7 +233,7 @@ struct MatchIntegrationTests {
     }
 
     @Test("All Device.Platform cases work with RegisterDevicesOptions")
-    func testAllDevicePlatforms() {
+    func allDevicePlatforms() {
         let platforms: [Device.Platform] = [.iOS, .macOS, .tvOS, .watchOS, .visionOS]
 
         for platform in platforms {

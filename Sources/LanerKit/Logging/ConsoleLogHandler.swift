@@ -85,19 +85,19 @@ public struct ConsoleLogHandler: LogHandler {
     private static func levelSymbolAndColor(_ level: Logger.Level) -> (String, String) {
         switch level {
         case .trace:
-            return ("TRACE", ANSIColor.gray)
+            ("TRACE", ANSIColor.gray)
         case .debug:
-            return ("DEBUG", ANSIColor.gray)
+            ("DEBUG", ANSIColor.gray)
         case .info:
-            return ("INFO ", ANSIColor.blue)
+            ("INFO ", ANSIColor.blue)
         case .notice:
-            return ("NOTE ", ANSIColor.cyan)
+            ("NOTE ", ANSIColor.cyan)
         case .warning:
-            return ("WARN ", ANSIColor.yellow)
+            ("WARN ", ANSIColor.yellow)
         case .error:
-            return ("ERROR", ANSIColor.red)
+            ("ERROR", ANSIColor.red)
         case .critical:
-            return ("CRIT ", ANSIColor.brightRed)
+            ("CRIT ", ANSIColor.brightRed)
         }
     }
 

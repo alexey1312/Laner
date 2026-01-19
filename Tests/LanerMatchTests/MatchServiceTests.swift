@@ -1,6 +1,6 @@
-import Testing
 import Foundation
 @testable import LanerMatch
+import Testing
 
 /// Integration tests for MatchService.
 ///
@@ -8,17 +8,17 @@ import Foundation
 /// Tests use mocked storage providers and API clients to avoid external dependencies.
 @Suite("MatchService Integration Tests")
 struct MatchServiceTests {
-
     // MARK: - Configuration Tests
 
     @Test("MatchConfiguration.fromEnvironment() parses all required variables")
-    func testConfigurationFromEnvironmentComplete() throws {
+    func configurationFromEnvironmentComplete() throws {
         // Note: Testing fromEnvironment() requires actual environment variables
         // This test verifies the parsing logic works correctly when variables are present
 
         // If MATCH_PASSWORD and MATCH_GIT_URL are set, test parsing
         if ProcessInfo.processInfo.environment["MATCH_PASSWORD"] != nil,
-           ProcessInfo.processInfo.environment["MATCH_GIT_URL"] != nil {
+           ProcessInfo.processInfo.environment["MATCH_GIT_URL"] != nil
+        {
             let config = try MatchConfiguration.fromEnvironment()
             // Basic validation - config was created successfully
             #expect(!config.password.isEmpty)
@@ -50,7 +50,7 @@ struct MatchServiceTests {
     }
 
     @Test("MatchConfiguration.fromEnvironment() uses default values")
-    func testConfigurationFromEnvironmentDefaults() throws {
+    func configurationFromEnvironmentDefaults() throws {
         // Test default values with direct initialization (matches fromEnvironment behavior)
         let config = MatchConfiguration(
             gitUrl: "https://github.com/test/certs.git",
@@ -70,7 +70,7 @@ struct MatchServiceTests {
     }
 
     @Test("MatchConfiguration.fromEnvironment() throws on missing MATCH_PASSWORD")
-    func testConfigurationFromEnvironmentMissingPassword() throws {
+    func configurationFromEnvironmentMissingPassword() throws {
         // Note: Testing actual environment variable errors would require process isolation
         // This test documents the expected behavior
 
@@ -83,7 +83,7 @@ struct MatchServiceTests {
     }
 
     @Test("MatchConfiguration.fromEnvironment() throws on missing MATCH_GIT_URL")
-    func testConfigurationFromEnvironmentMissingGitUrl() throws {
+    func configurationFromEnvironmentMissingGitUrl() throws {
         // Note: Testing actual environment variable errors would require process isolation
         // This test documents the expected behavior
 
@@ -96,7 +96,7 @@ struct MatchServiceTests {
     }
 
     @Test("MatchConfiguration boolean parsing handles various values")
-    func testConfigurationBooleanParsing() throws {
+    func configurationBooleanParsing() throws {
         // Test readonly true
         let config1 = MatchConfiguration(
             gitUrl: "https://test.git",
@@ -136,7 +136,7 @@ struct MatchServiceTests {
     // MARK: - MatchService Initialization Tests
 
     @Test("MatchService initializes with valid configuration")
-    func testMatchServiceInitialization() throws {
+    func matchServiceInitialization() throws {
         let config = MatchConfiguration(
             gitUrl: "https://github.com/test/certificates.git",
             branch: "main",
@@ -150,7 +150,7 @@ struct MatchServiceTests {
     }
 
     @Test("MatchService initializes API client when credentials provided")
-    func testMatchServiceInitializesAPIClient() async throws {
+    func matchServiceInitializesAPIClient() async throws {
         // Create a temporary key file for testing
         let tempKeyPath = FileManager.default.temporaryDirectory
             .appendingPathComponent("test_key_\(UUID().uuidString).p8")
@@ -187,7 +187,7 @@ struct MatchServiceTests {
     }
 
     @Test("MatchService initializes without API client when credentials not provided")
-    func testMatchServiceInitializesWithoutAPIClient() throws {
+    func matchServiceInitializesWithoutAPIClient() throws {
         let config = MatchConfiguration(
             gitUrl: "https://github.com/test/certificates.git",
             branch: "main",
@@ -201,7 +201,7 @@ struct MatchServiceTests {
     // MARK: - Mock Storage Tests
 
     @Test("MockStorageProvider downloads and uploads successfully")
-    func testMockStorageProvider() async throws {
+    func mockStorageProvider() async throws {
         let storage = MockStorageProvider()
 
         let tempPath = FileManager.default.temporaryDirectory
@@ -229,7 +229,7 @@ struct MatchServiceTests {
     // MARK: - SyncResult Tests
 
     @Test("SyncResult initializes correctly")
-    func testSyncResultInitialization() {
+    func syncResultInitialization() {
         let cert = Certificate(
             id: "cert1",
             serialNumber: "123456",
@@ -262,7 +262,7 @@ struct MatchServiceTests {
     // MARK: - NukeResult Tests
 
     @Test("NukeResult initializes correctly")
-    func testNukeResultInitialization() {
+    func nukeResultInitialization() {
         let result = NukeResult(certificatesRevoked: 3, profilesDeleted: 5)
 
         #expect(result.certificatesRevoked == 3)
@@ -272,7 +272,7 @@ struct MatchServiceTests {
     // MARK: - RegisterDevicesResult Tests
 
     @Test("RegisterDevicesResult initializes correctly")
-    func testRegisterDevicesResultInitialization() {
+    func registerDevicesResultInitialization() {
         let device1 = Device(
             id: "device1",
             udid: "00008030-001234567890401E",
@@ -302,7 +302,7 @@ struct MatchServiceTests {
     // MARK: - Integration Test Helpers
 
     @Test("MatchService with mock storage handles sync flow")
-    func testSyncFlowWithMockStorage() async throws {
+    func syncFlowWithMockStorage() async throws {
         // This test demonstrates the sync flow structure
         // In a full implementation, we would mock the storage provider
         // and verify the complete flow
@@ -325,7 +325,7 @@ struct MatchServiceTests {
     }
 
     @Test("MatchService configuration validation")
-    func testMatchServiceConfigurationValidation() throws {
+    func matchServiceConfigurationValidation() throws {
         // Test various configuration combinations
 
         // Valid minimal config
@@ -412,9 +412,8 @@ final class MockStorageProvider: StorageProvider, @unchecked Sendable {
 
 @Suite("MatchService Device Registration Tests")
 struct MatchServiceDeviceTests {
-
     @Test("Device registration parses file format correctly")
-    func testDeviceFileParsingTabDelimited() async throws {
+    func deviceFileParsingTabDelimited() async throws {
         let fileContent = """
         # Device list
         Device Name 1\t00008030-001234567890401E
@@ -459,7 +458,7 @@ struct MatchServiceDeviceTests {
     }
 
     @Test("Device registration handles empty and comment lines")
-    func testDeviceFileParsingWithEmptyLines() async throws {
+    func deviceFileParsingWithEmptyLines() async throws {
         let fileContent = """
 
         # Header comment
@@ -503,9 +502,8 @@ struct MatchServiceDeviceTests {
 
 @Suite("MatchService Error Handling Tests")
 struct MatchServiceErrorTests {
-
     @Test("Configuration validates required fields")
-    func testConfigurationRequiredFields() throws {
+    func configurationRequiredFields() throws {
         // Empty git URL should be accepted by initializer
         // (validation happens at runtime when used)
         let config = MatchConfiguration(
@@ -517,7 +515,7 @@ struct MatchServiceErrorTests {
     }
 
     @Test("Service handles missing API credentials gracefully")
-    func testServiceWithoutAPICredentials() throws {
+    func serviceWithoutAPICredentials() throws {
         let config = MatchConfiguration(
             gitUrl: "https://github.com/test/certs.git",
             teamId: "TEAM123",
@@ -531,7 +529,7 @@ struct MatchServiceErrorTests {
     }
 
     @Test("Readonly mode prevents certificate creation")
-    func testReadonlyModeValidation() {
+    func readonlyModeValidation() {
         let config = MatchConfiguration(
             gitUrl: "https://github.com/test/certs.git",
             teamId: "TEAM123",

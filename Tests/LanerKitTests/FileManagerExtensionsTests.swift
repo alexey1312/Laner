@@ -1,6 +1,6 @@
-import Testing
 import Foundation
 @testable import LanerKit
+import Testing
 
 @Suite("FileManager Extensions Tests")
 struct FileManagerExtensionsTests {

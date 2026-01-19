@@ -21,16 +21,16 @@ public enum ShellError: Error, Sendable, Equatable {
 extension ShellError: CustomStringConvertible {
     public var description: String {
         switch self {
-        case .commandNotFound(let command):
+        case let .commandNotFound(command):
             return "Command not found: \(command)"
-        case .timeout(let command, let duration):
+        case let .timeout(command, duration):
             return "Command '\(command)' timed out after \(duration)"
-        case .executionFailed(let command, let exitCode, let stderr):
+        case let .executionFailed(command, exitCode, stderr):
             let stderrSuffix = stderr.isEmpty ? "" : ": \(stderr)"
             return "Command '\(command)' failed with exit code \(exitCode)\(stderrSuffix)"
-        case .signalTerminated(let command, let signal):
+        case let .signalTerminated(command, signal):
             return "Command '\(command)' was terminated by signal \(signal)"
-        case .setupFailed(let message):
+        case let .setupFailed(message):
             return "Process setup failed: \(message)"
         }
     }

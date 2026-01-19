@@ -1,14 +1,17 @@
 <!-- OPENSPEC:START -->
+
 # OpenSpec Instructions
 
 These instructions are for AI assistants working in this project.
 
 Always open `@/openspec/AGENTS.md` when the request:
+
 - Mentions planning or proposals (words like proposal, spec, change, plan)
 - Introduces new capabilities, breaking changes, architecture shifts, or big performance/security work
 - Sounds ambiguous and you need the authoritative spec before coding
 
 Use `@/openspec/AGENTS.md` to learn:
+
 - How to create and apply change proposals
 - Spec format and conventions
 - Project structure and guidelines
@@ -50,6 +53,7 @@ macOS 13+, Swift 6.0
 ## Maintaining This Document
 
 Keep `CLAUDE.md` up-to-date when making significant changes:
+
 - Add new modules or major components
 - Update architecture patterns
 - Change key dependencies
@@ -58,10 +62,12 @@ Keep `CLAUDE.md` up-to-date when making significant changes:
 ## Maintaining Bilingual Instructions
 
 Usage instructions exist in two separate files:
+
 - `docs/USAGE.md` — English version
 - `docs/USAGE_RU.md` — Russian version
 
 When updating documentation:
+
 - **Keep both files in sync** — update `USAGE.md` and `USAGE_RU.md` together
 - Update command examples in both files
 - Add new features to both instruction sets
@@ -72,6 +78,7 @@ Note: Russian text should only exist in `docs/USAGE_RU.md`. All other documentat
 ## ROADMAP Maintenance
 
 When completing tasks from `ROADMAP.md`:
+
 - Mark completed items with checkboxes or move to "Completed" section
 - Update progress indicators if present
 - Add completion dates where appropriate
@@ -198,6 +205,7 @@ platform_rules[4]{rule,reason}:
 ### Cryptography (LanerMatch)
 
 CryptoService uses **swift-crypto** exclusively for cross-platform support:
+
 - Key derivation: `HKDF<SHA256>.deriveKey()`
 - Encryption: `AES.GCM.seal()` / `AES.GCM.open()`
 - Random bytes: `SymmetricKey(size:)` generates secure random data

@@ -1,7 +1,9 @@
 # Design: Laner Foundation
 
 ## Context
+
 We're building a Swift-native replacement for Fastlane. The foundation must:
+
 - Use Swift 6 (swift-tools-version: 6.0) with default concurrency model
 - Be modular for future plugin development
 - Handle async process execution safely
@@ -12,6 +14,7 @@ We're building a Swift-native replacement for Fastlane. The foundation must:
 ## Goals / Non-Goals
 
 **Goals:**
+
 - Establish clean module boundaries
 - Provide type-safe async shell execution
 - Support streaming output for long-running processes
@@ -19,6 +22,7 @@ We're building a Swift-native replacement for Fastlane. The foundation must:
 - Minimal but functional DSL infrastructure
 
 **Non-Goals:**
+
 - Full DSL with result builders (Phase 2)
 - Code signing / Match (Phase 3)
 - Upload capabilities (Phase 4-5)
@@ -97,12 +101,16 @@ extension Logger {
 Swift 6 has data-race safety enabled by default. We follow these guidelines:
 
 ### When to Use Actors
+
 Use actors only when you have **mutable state that needs isolation**:
+
 - `ShellExecutor` — tracks running processes
 - `ExecutionContext` — holds mutable artifact store
 
 ### When Structs Are Sufficient
+
 Use plain structs for stateless or immutable types:
+
 - `ProcessResult` — immutable result data
 - `BuildOptions`, `TestOptions` — configuration passed to functions
 - `XcodebuildExecutor` — stateless, just wraps shell calls
@@ -141,10 +149,10 @@ public actor ExecutionContext {
 
 ## Risks / Trade-offs
 
-| Risk | Mitigation |
-|------|------------|
-| Process execution complexity | Well-tested Foundation.Process wrapper |
-| xcodebuild output parsing fragile | Structured tests with real output fixtures |
+| Risk                                 | Mitigation                                  |
+| ------------------------------------ | ------------------------------------------- |
+| Process execution complexity         | Well-tested Foundation.Process wrapper      |
+| xcodebuild output parsing fragile    | Structured tests with real output fixtures  |
 | Actor overhead for simple operations | Use actors only where needed, profile later |
 
 ## Migration Plan

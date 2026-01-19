@@ -24,8 +24,8 @@ public struct LaneMetadata: Codable, Sendable, Hashable {
     /// Creates metadata from a lane.
     /// - Parameter lane: The lane to extract metadata from.
     public init(from lane: Lane) {
-        self.name = lane.name
-        self.description = lane.description
+        name = lane.name
+        description = lane.description
     }
 }
 
@@ -96,7 +96,7 @@ extension Lanerfile: Codable {
         let metadata = try container.decode([LaneMetadata].self, forKey: .lanes)
 
         // Create lanes with empty bodies for metadata-only representation
-        self.lanes = metadata.map { meta in
+        lanes = metadata.map { meta in
             Lane(name: meta.name, description: meta.description) { _ in
                 // Empty body - execution not supported for decoded manifests
             }
@@ -115,9 +115,9 @@ extension Lanerfile: Codable {
 
 // MARK: - Lane Metadata Conversion
 
-extension Lane {
+public extension Lane {
     /// Returns metadata for this lane.
-    public var metadata: LaneMetadata {
+    var metadata: LaneMetadata {
         LaneMetadata(from: self)
     }
 }

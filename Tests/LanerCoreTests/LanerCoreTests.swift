@@ -1,6 +1,6 @@
-import Testing
 import Foundation
 @testable import LanerCore
+import Testing
 
 // MARK: - GlobalOptions Tests
 
@@ -74,7 +74,7 @@ struct CLIErrorTests {
     }
 
     @Test("testFailed with failures has descriptive message")
-    func testFailedWithFailuresHasDescriptiveMessage() {
+    func failedWithFailuresHasDescriptiveMessage() {
         let error = CLIError.testFailed(failedTests: ["test1", "test2", "test3"])
         #expect(error.errorDescription?.contains("3 test(s)") == true)
     }
@@ -119,7 +119,7 @@ struct LanerExitCodeTests {
     }
 
     @Test("testFailure is 3")
-    func testFailureIsThree() {
+    func failureIsThree() {
         #expect(LanerExitCode.testFailure.rawValue == 3)
     }
 
@@ -137,43 +137,43 @@ struct LanerExitCodeTests {
 // MARK: - Command Configuration Tests
 
 #if os(macOS)
-@Suite("Command Configuration Tests")
-struct CommandConfigurationTests {
-    @Test("VersionCommand has correct configuration")
-    func versionCommandHasCorrectConfiguration() {
-        #expect(VersionCommand.configuration.commandName == "version")
-    }
+    @Suite("Command Configuration Tests")
+    struct CommandConfigurationTests {
+        @Test("VersionCommand has correct configuration")
+        func versionCommandHasCorrectConfiguration() {
+            #expect(VersionCommand.configuration.commandName == "version")
+        }
 
-    @Test("DoctorCommand has correct configuration")
-    func doctorCommandHasCorrectConfiguration() {
-        #expect(DoctorCommand.configuration.commandName == "doctor")
-    }
+        @Test("DoctorCommand has correct configuration")
+        func doctorCommandHasCorrectConfiguration() {
+            #expect(DoctorCommand.configuration.commandName == "doctor")
+        }
 
-    @Test("BuildCommand has correct configuration")
-    func buildCommandHasCorrectConfiguration() {
-        #expect(BuildCommand.configuration.commandName == "build")
-    }
+        @Test("BuildCommand has correct configuration")
+        func buildCommandHasCorrectConfiguration() {
+            #expect(BuildCommand.configuration.commandName == "build")
+        }
 
-    @Test("TestCommand has correct configuration")
-    func testCommandHasCorrectConfiguration() {
-        #expect(TestCommand.configuration.commandName == "test")
-    }
+        @Test("TestCommand has correct configuration")
+        func commandHasCorrectConfiguration() {
+            #expect(TestCommand.configuration.commandName == "test")
+        }
 
-    @Test("InitCommand has correct configuration")
-    func initCommandHasCorrectConfiguration() {
-        #expect(InitCommand.configuration.commandName == "init")
-    }
+        @Test("InitCommand has correct configuration")
+        func initCommandHasCorrectConfiguration() {
+            #expect(InitCommand.configuration.commandName == "init")
+        }
 
-    @Test("LanesCommand has correct configuration")
-    func lanesCommandHasCorrectConfiguration() {
-        #expect(LanesCommand.configuration.commandName == "lanes")
-    }
+        @Test("LanesCommand has correct configuration")
+        func lanesCommandHasCorrectConfiguration() {
+            #expect(LanesCommand.configuration.commandName == "lanes")
+        }
 
-    @Test("LaneCommand has correct configuration")
-    func laneCommandHasCorrectConfiguration() {
-        #expect(LaneCommand.configuration.commandName == "lane")
+        @Test("LaneCommand has correct configuration")
+        func laneCommandHasCorrectConfiguration() {
+            #expect(LaneCommand.configuration.commandName == "lane")
+        }
     }
-}
 #endif
 
 // MARK: - ManifestCache Tests

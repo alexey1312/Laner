@@ -25,6 +25,7 @@ Historically, Spaceship (Fastlane's core for interacting with Apple) used undocu
 Fastlane 3.0 plans to fully transition to the official App Store Connect API and use code generation from OpenAPI specifications.
 
 ### Sources:
+
 - [Error 410 Gone Issue #14572](https://github.com/fastlane/fastlane/issues/14572)
 - [Fastlane 3.0 Discussion #20463](https://github.com/fastlane/fastlane/discussions/20463)
 - [SPACESHIP_SKIP_2FA_UPGRADE Issue #21301](https://github.com/fastlane/fastlane/issues/21301)
@@ -66,6 +67,7 @@ eval_gemfile(plugins_path) if File.exist?(plugins_path)
 ```
 
 ### Sources:
+
 - [Ruby Version Problems Issue #16790](https://github.com/fastlane/fastlane/issues/16790)
 - [Ruby 3.0 Support Plan Issue #17931](https://github.com/fastlane/fastlane/issues/17931)
 - [Buildkite Fastlane Troubleshooting](https://buildkite.com/docs/pipelines/hosted-agents/mobile-delivery-cloud/troubleshooting-fastlane)
@@ -96,6 +98,7 @@ end
 ```
 
 ### Sources:
+
 - [Code Signing Troubleshooting](https://docs.fastlane.tools/codesigning/troubleshooting/)
 - [Common Code Signing Issues](https://docs.fastlane.tools/codesigning/common-issues/)
 - [Thoughts on Xcode Cloud](https://www.oliverbinns.co.uk/posts/xcode-cloud-thoughts/)
@@ -120,6 +123,7 @@ Fastlane feels like a project in maintenance mode:
 - 2021-2024: Maintenance mode, slow migration to official APIs
 
 ### Sources:
+
 - [Fastlane for Indies (2024)](https://www.jessesquires.com/blog/2024/01/22/fastlane-for-indies/)
 
 ---
@@ -138,6 +142,7 @@ Fastlane focuses only on release automation:
 ### Integration Required:
 
 For a complete CI/CD, integration with external systems is necessary:
+
 - Jenkins
 - GitHub Actions
 - GitLab CI
@@ -145,6 +150,7 @@ For a complete CI/CD, integration with external systems is necessary:
 - CircleCI
 
 ### Sources:
+
 - [Comparing Mobile CI/CD Providers](https://www.runway.team/blog/comparing-the-top-10-mobile-ci-cd-providers)
 
 ---
@@ -170,21 +176,22 @@ app_store_connect_api_key(
 Using an API key eliminates the need to deal with 2FA on CI machines.
 
 ### Sources:
+
 - [2FA with Fastlane - Stack Overflow](https://stackoverflow.com/questions/63508108/two-factor-authentication-with-fastlane)
 
 ---
 
 ## 7. Comparison with Alternatives
 
-| Aspect | Fastlane | Xcode Cloud | GitHub Actions |
-|--------|----------|-------------|----------------|
-| **Code Signing** | Complex (match) | "Just works" | Requires fastlane |
-| **Cost** | Free | $50/100 hours | $4.80/hour Mac runner |
-| **Customization** | High | Limited | High |
-| **Setup** | Complex | Simple | Medium |
-| **Dependencies** | Ruby, gems | None | YAML workflows |
-| **Android Support** | Yes | No | Yes |
-| **Notifications** | Slack, email, custom | Slack, email | Any |
+| Aspect              | Fastlane             | Xcode Cloud   | GitHub Actions        |
+| ------------------- | -------------------- | ------------- | --------------------- |
+| **Code Signing**    | Complex (match)      | "Just works"  | Requires fastlane     |
+| **Cost**            | Free                 | $50/100 hours | $4.80/hour Mac runner |
+| **Customization**   | High                 | Limited       | High                  |
+| **Setup**           | Complex              | Simple        | Medium                |
+| **Dependencies**    | Ruby, gems           | None          | YAML workflows        |
+| **Android Support** | Yes                  | No            | Yes                   |
+| **Notifications**   | Slack, email, custom | Slack, email  | Any                   |
 
 ### When to Use Fastlane:
 

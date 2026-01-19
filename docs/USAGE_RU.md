@@ -50,6 +50,7 @@ laner doctor
 ```
 
 Команда проверит:
+
 - Версию Swift
 - Версию Git
 - Наличие Xcode (только macOS)
@@ -105,17 +106,17 @@ laner lane release
 
 ## Основные команды
 
-| Команда | Описание |
-|---------|----------|
-| `laner version` | Показать версию Laner |
-| `laner doctor` | Проверить окружение |
-| `laner init` | Инициализировать проект |
-| `laner lanes` | Список доступных lanes |
-| `laner lane <имя>` | Выполнить lane |
-| `laner build` | Собрать проект |
-| `laner test` | Запустить тесты |
-| `laner match sync` | Синхронизировать сертификаты |
-| `laner upload testflight` | Загрузить в TestFlight |
+| Команда                   | Описание                     |
+| ------------------------- | ---------------------------- |
+| `laner version`           | Показать версию Laner        |
+| `laner doctor`            | Проверить окружение          |
+| `laner init`              | Инициализировать проект      |
+| `laner lanes`             | Список доступных lanes       |
+| `laner lane <имя>`        | Выполнить lane               |
+| `laner build`             | Собрать проект               |
+| `laner test`              | Запустить тесты              |
+| `laner match sync`        | Синхронизировать сертификаты |
+| `laner upload testflight` | Загрузить в TestFlight       |
 
 ## Настройка Code Signing (Match)
 

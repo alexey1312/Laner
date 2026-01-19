@@ -1,7 +1,7 @@
-import Testing
 import Foundation
-import Logging
 @testable import LanerDSL
+import Logging
+import Testing
 
 // MARK: - Test Helpers
 
@@ -123,7 +123,7 @@ struct EnvironmentTests {
             "TRUE3": "yes",
             "TRUE4": "ON",
             "FALSE1": "false",
-            "FALSE2": "0"
+            "FALSE2": "0",
         ])
         #expect(env.getBool("TRUE1"))
         #expect(env.getBool("TRUE2"))
@@ -297,7 +297,7 @@ struct LaneTests {
     func createsLaneFromActions() {
         let actions = [
             AnyAction(EchoAction(message: "step 1")),
-            AnyAction(EchoAction(message: "step 2"))
+            AnyAction(EchoAction(message: "step 2")),
         ]
         let lane = Lane(name: "multi", actions: actions)
 
@@ -322,7 +322,7 @@ struct LaneTests {
     func executesLaneActionsInOrder() async throws {
         var order: [String] = []
 
-        let lane = Lane(name: "ordered") { context in
+        let lane = Lane(name: "ordered") { _ in
             order.append("first")
             order.append("second")
             order.append("third")
@@ -394,7 +394,7 @@ struct LaneRunnerTests {
         let result = await runner.run(lane)
 
         let durationMS = Double(result.duration.components.seconds) * 1000 +
-                         Double(result.duration.components.attoseconds) / 1e15
+            Double(result.duration.components.attoseconds) / 1e15
         #expect(durationMS >= 50)
     }
 }
@@ -479,7 +479,7 @@ struct LanerConfigurationTests {
         static var lanes: [Lane] {
             [
                 Lane(name: "build", description: "Builds the app") { _ in },
-                Lane(name: "test", description: "Runs tests") { _ in }
+                Lane(name: "test", description: "Runs tests") { _ in },
             ]
         }
     }
@@ -502,7 +502,7 @@ struct LanerConfigurationTests {
             static var lanes: [Lane] {
                 [
                     Lane(name: "a") { _ in },
-                    Lane(name: "b") { _ in }
+                    Lane(name: "b") { _ in },
                 ]
             }
         }
@@ -515,7 +515,7 @@ struct LanerConfigurationTests {
             static var lanes: [Lane] {
                 [
                     Lane(name: "same") { _ in },
-                    Lane(name: "same") { _ in }
+                    Lane(name: "same") { _ in },
                 ]
             }
         }

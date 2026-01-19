@@ -59,7 +59,8 @@ public actor GitStorage: StorageProvider {
 
             // Decode base64 basic auth
             if let data = Data(base64Encoded: basicAuth),
-               let decoded = String(data: data, encoding: .utf8) {
+               let decoded = String(data: data, encoding: .utf8)
+            {
                 let components = decoded.split(separator: ":", maxSplits: 1)
                 if components.count == 2 {
                     env["GIT_USERNAME"] = String(components[0])
@@ -71,7 +72,7 @@ public actor GitStorage: StorageProvider {
         // Disable Git terminal prompts
         env["GIT_TERMINAL_PROMPT"] = "0"
 
-        self.environment = env
+        environment = env
     }
 
     public func download(to localPath: URL) async throws {
@@ -180,7 +181,7 @@ public actor GitStorage: StorageProvider {
             "--branch", branch,
             "--single-branch",
             gitUrl,
-            localPath.path
+            localPath.path,
         ]
 
         // Handle authentication for HTTPS URLs
@@ -264,7 +265,8 @@ public actor GitStorage: StorageProvider {
         guard let username = environment["GIT_USERNAME"],
               let password = environment["GIT_PASSWORD"],
               !username.isEmpty,
-              !password.isEmpty else {
+              !password.isEmpty
+        else {
             return nil
         }
 
@@ -278,10 +280,11 @@ public actor GitStorage: StorageProvider {
 
     private func mapGitError(_ error: ShellError, operation: String) -> MatchError {
         switch error {
-        case .executionFailed(_, _, let stderr):
+        case let .executionFailed(_, _, stderr):
             if stderr.contains("Authentication failed") ||
-               stderr.contains("Permission denied") ||
-               stderr.contains("Could not read from remote repository") {
+                stderr.contains("Permission denied") ||
+                stderr.contains("Could not read from remote repository")
+            {
                 return .gitAuthenticationFailed
             }
             if operation == "push" {
@@ -295,7 +298,7 @@ public actor GitStorage: StorageProvider {
             }
             return .gitCloneFailed("Operation timed out")
 
-        case .commandNotFound(let command):
+        case let .commandNotFound(command):
             if operation == "push" {
                 return .gitPushFailed("Git not found: \(command)")
             }

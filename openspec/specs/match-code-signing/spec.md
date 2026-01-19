@@ -5,6 +5,7 @@
 Laner Match provides secure, Git-based code signing management for iOS development teams. It synchronizes certificates and provisioning profiles across team members, enabling consistent and reproducible code signing for development, distribution, and App Store builds.
 
 Match addresses common iOS code signing challenges:
+
 - Eliminates manual certificate and profile management
 - Enables secure sharing across team members and CI/CD systems
 - Provides version control for signing assets via encrypted Git storage

@@ -1,9 +1,9 @@
-import Foundation
 import AsyncHTTPClient
+import Foundation
+import LanerKit
+import Logging
 import NIOCore
 import NIOHTTP1
-import Logging
-import LanerKit
 
 /// Actor-based client for App Store Connect API
 public actor AppStoreConnectAPI {
@@ -28,7 +28,9 @@ public actor AppStoreConnectAPI {
         // Validate and create JWT generator FIRST (before creating HTTP client)
         // This ensures we don't create HTTP client if validation fails
         var isDirectory: ObjCBool = false
-        guard FileManager.default.fileExists(atPath: privateKeyPath, isDirectory: &isDirectory), !isDirectory.boolValue else {
+        guard FileManager.default.fileExists(atPath: privateKeyPath, isDirectory: &isDirectory),
+              !isDirectory.boolValue
+        else {
             throw MatchError.fileNotFound(privateKeyPath)
         }
 
@@ -39,9 +41,9 @@ public actor AppStoreConnectAPI {
         self.keyId = keyId
         self.issuerId = issuerId
         self.privateKeyPath = privateKeyPath
-        self.jwtGenerator = generator
-        self.httpClient = HTTPClient(eventLoopGroupProvider: .singleton)
-        self.logger = Logger(label: "com.laner.match.api")
+        jwtGenerator = generator
+        httpClient = HTTPClient(eventLoopGroupProvider: .singleton)
+        logger = Logger(label: "com.laner.match.api")
     }
 
     /// Shuts down the HTTP client. Call this when done using the API client.
@@ -58,7 +60,8 @@ public actor AppStoreConnectAPI {
         // Check if we have a valid cached token
         if let token = cachedToken,
            let expiration = tokenExpiration,
-           now < expiration.addingTimeInterval(-60) { // Refresh 1 minute before expiry
+           now < expiration.addingTimeInterval(-60)
+        { // Refresh 1 minute before expiry
             return token
         }
 
@@ -86,7 +89,7 @@ public actor AppStoreConnectAPI {
         request.headers.add(name: "Authorization", value: "Bearer \(token)")
         request.headers.add(name: "Content-Type", value: "application/json")
 
-        if let body = body {
+        if let body {
             request.body = .bytes(ByteBuffer(bytes: body))
         }
 
@@ -139,7 +142,7 @@ public actor AppStoreConnectAPI {
     /// - Returns: Array of certificates
     public func listCertificates(type: CertificateType? = nil) async throws -> [Certificate] {
         var path = "/certificates?limit=200"
-        if let type = type {
+        if let type {
             path += "&filter[certificateType]=\(type.appleType)"
         }
 
@@ -204,13 +207,17 @@ public actor AppStoreConnectAPI {
     ///   - type: Optional profile type filter
     ///   - bundleId: Optional bundle ID filter
     /// - Returns: Array of provisioning profiles
-    public func listProfiles(type: CertificateType? = nil, bundleId: String? = nil) async throws -> [ProvisioningProfile] {
+    public func listProfiles(
+        type: CertificateType? = nil,
+        bundleId: String? = nil
+    ) async throws -> [ProvisioningProfile] {
         var path = "/profiles?limit=200"
-        if let type = type {
+        if let type {
             path += "&filter[profileType]=\(type.profileType)"
         }
-        if let bundleId = bundleId {
-            path += "&filter[name]=\(bundleId.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? bundleId)"
+        if let bundleId {
+            let encoded = bundleId.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? bundleId
+            path += "&filter[name]=\(encoded)"
         }
 
         let response: ProfilesResponse = try await executeRequest(method: .GET, path: path)
@@ -309,7 +316,7 @@ public actor AppStoreConnectAPI {
     /// - Returns: Array of devices
     public func listDevices(platform: Device.Platform? = nil) async throws -> [Device] {
         var path = "/devices?limit=200"
-        if let platform = platform {
+        if let platform {
             path += "&filter[platform]=\(platform.rawValue)"
         }
 
@@ -503,24 +510,24 @@ private extension CertificateType {
     static func from(appleType: String) -> CertificateType {
         switch appleType {
         case "IOS_DEVELOPMENT", "MAC_APP_DEVELOPMENT", "DEVELOPMENT":
-            return .development
+            .development
         case "IOS_DISTRIBUTION", "MAC_APP_DISTRIBUTION", "DISTRIBUTION":
-            return .distribution
+            .distribution
         default:
-            return .distribution
+            .distribution
         }
     }
 
     static func from(profileType: String) -> CertificateType {
         switch profileType {
         case "IOS_APP_DEVELOPMENT", "MAC_APP_DEVELOPMENT":
-            return .development
+            .development
         case "IOS_APP_STORE", "MAC_APP_STORE", "TVOS_APP_STORE":
-            return .appstore
+            .appstore
         case "IOS_APP_ADHOC", "TVOS_APP_ADHOC":
-            return .adhoc
+            .adhoc
         default:
-            return .appstore
+            .appstore
         }
     }
 }

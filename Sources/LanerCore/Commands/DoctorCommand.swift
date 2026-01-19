@@ -1,7 +1,7 @@
 import ArgumentParser
 import Foundation
-import Logging
 import LanerKit
+import Logging
 
 /// Checks the environment for required tools and configuration.
 public struct DoctorCommand: AsyncParsableCommand {
@@ -34,23 +34,23 @@ public struct DoctorCommand: AsyncParsableCommand {
         if !gitCheck.passed { allPassed = false }
 
         #if os(macOS)
-        // Check Xcode (macOS only)
-        let xcodeCheck = await checkXcode()
-        printCheckResult("Xcode", xcodeCheck)
-        if !xcodeCheck.passed { allPassed = false }
+            // Check Xcode (macOS only)
+            let xcodeCheck = await checkXcode()
+            printCheckResult("Xcode", xcodeCheck)
+            if !xcodeCheck.passed { allPassed = false }
 
-        // Check xcodebuild
-        let xcodebuildCheck = await checkXcodebuild()
-        printCheckResult("xcodebuild", xcodebuildCheck)
-        if !xcodebuildCheck.passed { allPassed = false }
+            // Check xcodebuild
+            let xcodebuildCheck = await checkXcodebuild()
+            printCheckResult("xcodebuild", xcodebuildCheck)
+            if !xcodebuildCheck.passed { allPassed = false }
 
-        // Check code signing tools
-        let codesignCheck = await checkCodesign()
-        printCheckResult("codesign", codesignCheck)
-        if !codesignCheck.passed { allPassed = false }
+            // Check code signing tools
+            let codesignCheck = await checkCodesign()
+            printCheckResult("codesign", codesignCheck)
+            if !codesignCheck.passed { allPassed = false }
         #else
-        print("Note: Running on Linux - Xcode tools not available")
-        print("")
+            print("Note: Running on Linux - Xcode tools not available")
+            print("")
         #endif
 
         // Summary
@@ -123,54 +123,54 @@ public struct DoctorCommand: AsyncParsableCommand {
     }
 
     #if os(macOS)
-    private func checkXcode() async -> CheckResult {
-        do {
-            let shell = ShellExecutor()
-            // Check if Xcode is selected
-            let selectResult = try await shell.run("xcode-select", arguments: ["-p"])
-            if !selectResult.isSuccess {
-                return .failure(message: "No Xcode selected - run 'xcode-select --install'")
-            }
-
-            // Get Xcode version
-            let task = Process()
-            task.executableURL = URL(fileURLWithPath: "/usr/bin/xcodebuild")
-            task.arguments = ["-version"]
-
-            let pipe = Pipe()
-            task.standardOutput = pipe
-            task.standardError = FileHandle.nullDevice
-
-            try task.run()
-            task.waitUntilExit()
-
-            let data = pipe.fileHandleForReading.readDataToEndOfFile()
-            if let output = String(data: data, encoding: .utf8) {
-                let lines = output.components(separatedBy: .newlines)
-                if let firstLine = lines.first, !firstLine.isEmpty {
-                    return .success(version: firstLine.replacingOccurrences(of: "Xcode ", with: ""))
+        private func checkXcode() async -> CheckResult {
+            do {
+                let shell = ShellExecutor()
+                // Check if Xcode is selected
+                let selectResult = try await shell.run("xcode-select", arguments: ["-p"])
+                if !selectResult.isSuccess {
+                    return .failure(message: "No Xcode selected - run 'xcode-select --install'")
                 }
+
+                // Get Xcode version
+                let task = Process()
+                task.executableURL = URL(fileURLWithPath: "/usr/bin/xcodebuild")
+                task.arguments = ["-version"]
+
+                let pipe = Pipe()
+                task.standardOutput = pipe
+                task.standardError = FileHandle.nullDevice
+
+                try task.run()
+                task.waitUntilExit()
+
+                let data = pipe.fileHandleForReading.readDataToEndOfFile()
+                if let output = String(data: data, encoding: .utf8) {
+                    let lines = output.components(separatedBy: .newlines)
+                    if let firstLine = lines.first, !firstLine.isEmpty {
+                        return .success(version: firstLine.replacingOccurrences(of: "Xcode ", with: ""))
+                    }
+                }
+                return .failure(message: "Unable to determine version")
+            } catch {
+                return .failure(message: "Not installed - download from App Store")
             }
-            return .failure(message: "Unable to determine version")
-        } catch {
-            return .failure(message: "Not installed - download from App Store")
         }
-    }
 
-    private func checkXcodebuild() async -> CheckResult {
-        let fileManager = FileManager.default
-        guard let path = fileManager.findExecutable("xcodebuild") else {
-            return .failure(message: "Not found - install Xcode Command Line Tools")
+        private func checkXcodebuild() async -> CheckResult {
+            let fileManager = FileManager.default
+            guard let path = fileManager.findExecutable("xcodebuild") else {
+                return .failure(message: "Not found - install Xcode Command Line Tools")
+            }
+            return .success(version: "Available at \(path)")
         }
-        return .success(version: "Available at \(path)")
-    }
 
-    private func checkCodesign() async -> CheckResult {
-        let fileManager = FileManager.default
-        guard let path = fileManager.findExecutable("codesign") else {
-            return .failure(message: "Not found")
+        private func checkCodesign() async -> CheckResult {
+            let fileManager = FileManager.default
+            guard let path = fileManager.findExecutable("codesign") else {
+                return .failure(message: "Not found")
+            }
+            return .success(version: "Available at \(path)")
         }
-        return .success(version: "Available at \(path)")
-    }
     #endif
 }

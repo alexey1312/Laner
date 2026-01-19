@@ -1,6 +1,7 @@
 # Tasks: Initialize Laner Foundation
 
 ## 1. Project Setup
+
 - [x] 1.1 Create Package.swift with swift-tools-version: 6.0
 - [x] 1.2 Configure module structure (laner, LanerCore, LanerDSL, LanerKit, LanerPluginKit)
 - [x] 1.3 Add dependencies (swift-argument-parser, swift-log)
@@ -9,6 +10,7 @@
 - [x] 1.6 Verify `swift build` succeeds with empty targets
 
 ## 2. LanerKit (Shared Utilities)
+
 - [x] 2.1 Create `ProcessResult` struct
 - [x] 2.2 Create `ShellError` enum with cases (commandNotFound, timeout, executionFailed)
 - [x] 2.3 Create `FileManager+Extensions` for common operations
@@ -16,6 +18,7 @@
 - [x] 2.5 Write unit tests for utilities
 
 ## 3. Shell Executor
+
 - [x] 3.1 Create `ShellExecutor` actor with `run()` method
 - [x] 3.2 Implement `stream()` method returning `AsyncThrowingStream<String, Error>`
 - [x] 3.3 Add working directory support
@@ -25,6 +28,7 @@
 - [x] 3.7 Write integration tests with real commands (echo, pwd)
 
 ## 4. Logging
+
 - [x] 4.1 Create `LogCategory` enum (shell, xcodebuild, cli, dsl, config)
 - [x] 4.2 Create `Logger.laner(_:)` factory method
 - [x] 4.3 Create `ConsoleLogHandler` with color support
@@ -33,6 +37,7 @@
 - [x] 4.6 Write tests for log formatting
 
 ## 5. Xcodebuild Executor (macOS only)
+
 - [x] 5.1 Create `BuildOptions` struct
 - [x] 5.2 Create `TestOptions` struct
 - [x] 5.3 Create `ArchiveOptions` struct
@@ -47,6 +52,7 @@
 - [x] 5.12 Write integration test with real xcodebuild (optional, CI-only)
 
 ## 6. DSL Core
+
 - [x] 6.1 Create `Action` protocol
 - [x] 6.2 Create `AnyAction` type-erased wrapper
 - [x] 6.3 Create `Lane` struct with name, description, actions
@@ -58,6 +64,7 @@
 - [x] 6.9 Write tests for lane execution
 
 ## 7. CLI Commands
+
 - [x] 7.1 Create main entry point with ArgumentParser
 - [x] 7.2 Create `LanerCommand` root command with global options
 - [x] 7.3 Implement `VersionCommand`
@@ -70,6 +77,7 @@
 - [x] 7.10 Write integration tests for commands
 
 ## 8. Integration & Polish
+
 - [x] 8.1 End-to-end test: `laner build` on sample project (manual verification)
 - [x] 8.2 End-to-end test: `laner test` on sample project (manual verification)
 - [x] 8.3 Verify Swift 6 builds without warnings
@@ -77,6 +85,7 @@
 - [x] 8.5 Create Examples/BasicLanerfile.swift
 
 ## Dependencies
+
 - Tasks 2.x must complete before 3.x (ShellExecutor depends on Kit)
 - Tasks 3.x must complete before 5.x (XcodebuildExecutor uses ShellExecutor)
 - Tasks 4.x can run in parallel with 3.x
@@ -85,7 +94,9 @@
 - Tasks 8.x require all previous tasks
 
 ## Verification
+
 After all tasks complete:
+
 - [x] `swift build` succeeds on macOS
 - [x] `swift build` succeeds on Linux (with platform stubs)
 - [x] `swift test` passes all tests

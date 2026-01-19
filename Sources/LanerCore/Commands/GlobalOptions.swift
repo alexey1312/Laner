@@ -27,7 +27,7 @@ public struct GlobalOptions: ParsableArguments {
 
     /// The working directory URL, defaulting to current directory.
     public var workingDirectoryURL: URL {
-        if let directory = directory {
+        if let directory {
             return URL(fileURLWithPath: directory)
         }
         return URL(fileURLWithPath: FileManager.default.currentDirectoryPath)

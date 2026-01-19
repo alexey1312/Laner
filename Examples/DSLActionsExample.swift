@@ -112,7 +112,7 @@ struct ExampleConfig: LanerConfiguration {
                     workspace: "MyApp.xcworkspace",
                     codeCoverage: true
                 )
-            }
+            },
         ]
     }
 }

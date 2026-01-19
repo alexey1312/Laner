@@ -1,5 +1,5 @@
-import Testing
 @testable import LanerMatch
+import Testing
 
 @Suite("CertificateType Tests")
 struct CertificateTypeTests {

@@ -28,8 +28,8 @@ public actor TestFlightService {
         processingTimeout: TimeInterval = TestFlightService.defaultProcessingTimeout
     ) {
         self.api = api
-        self.uploader = ChunkedUploader(api: api)
-        self.logger = Logger(label: "com.laner.match.testflight")
+        uploader = ChunkedUploader(api: api)
+        logger = Logger(label: "com.laner.match.testflight")
         self.pollingInterval = pollingInterval
         self.processingTimeout = processingTimeout
     }
@@ -110,7 +110,7 @@ public actor TestFlightService {
         logger.info("Distributing build \(buildId) to TestFlight")
 
         // Set what's new if provided
-        if let whatsNew = whatsNew, !whatsNew.isEmpty {
+        if let whatsNew, !whatsNew.isEmpty {
             logger.info("Setting release notes")
             try await api.setBetaTestInfo(buildId: buildId, whatsNew: whatsNew)
         }
@@ -161,7 +161,7 @@ public actor TestFlightService {
     ///   - limit: Maximum number of builds to return.
     /// - Returns: Array of recent builds.
     public func listRecentBuilds(appId: String, limit: Int = 10) async throws -> [Build] {
-        return try await api.listBuilds(appId: appId, limit: limit)
+        try await api.listBuilds(appId: appId, limit: limit)
     }
 
     /// Performs a complete upload and distribute operation.
@@ -201,14 +201,14 @@ public actor TestFlightService {
         }
 
         // Distribute to groups if specified
-        if let groups = groups, !groups.isEmpty {
+        if let groups, !groups.isEmpty {
             try await distribute(
                 buildId: processedBuild.id,
                 groups: groups,
                 whatsNew: whatsNew,
                 appId: appId
             )
-        } else if let whatsNew = whatsNew, !whatsNew.isEmpty {
+        } else if let whatsNew, !whatsNew.isEmpty {
             // Set what's new even without groups
             try await api.setBetaTestInfo(buildId: processedBuild.id, whatsNew: whatsNew)
         }

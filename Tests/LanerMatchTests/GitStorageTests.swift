@@ -1,6 +1,6 @@
-import Testing
 import Foundation
 @testable import LanerMatch
+import Testing
 
 @Suite("GitStorage Tests")
 struct GitStorageTests {
@@ -36,7 +36,7 @@ struct GitStorageTests {
         let urls = [
             "git@github.com:user/repo.git",
             "git@gitlab.com:organization/project.git",
-            "git@bitbucket.org:team/repository.git"
+            "git@bitbucket.org:team/repository.git",
         ]
 
         for url in urls {
@@ -50,7 +50,7 @@ struct GitStorageTests {
         let urls = [
             "https://github.com/user/repo.git",
             "https://gitlab.com/organization/project.git",
-            "https://bitbucket.org/team/repository.git"
+            "https://bitbucket.org/team/repository.git",
         ]
 
         for url in urls {

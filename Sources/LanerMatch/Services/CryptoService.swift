@@ -1,5 +1,5 @@
-import Foundation
 import Crypto
+import Foundation
 
 /// Thread-safe cryptography service for encrypting and decrypting Match data.
 ///
@@ -9,7 +9,7 @@ import Crypto
 /// - Uses AES-256-GCM with 12-byte nonce
 /// - Auth tag is 16 bytes appended to ciphertext
 /// - File format: [salt:16][nonce:12][ciphertext][tag:16]
-public actor CryptoService: Sendable {
+public actor CryptoService {
     private static let saltLength = 16
     private static let nonceLength = 12
     private static let tagLength = 16
@@ -111,8 +111,9 @@ public actor CryptoService: Sendable {
             // On Linux with BoringSSL, the error may be underlyingCoreCryptoError instead
             let errorDescription = String(describing: error).lowercased()
             if errorDescription.contains("authenticationfailure") ||
-               errorDescription.contains("authentication") ||
-               errorDescription.contains("underlyingcorecryptoerror") {
+                errorDescription.contains("authentication") ||
+                errorDescription.contains("underlyingcorecryptoerror")
+            {
                 throw MatchError.invalidPassword
             }
             throw MatchError.decryptionFailed(error.localizedDescription)

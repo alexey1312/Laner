@@ -19,11 +19,13 @@ LanerMatch can be configured using environment variables, making it ideal for CI
 **Security:** This password should be kept secure and never committed to version control. Store it in your CI/CD secrets manager.
 
 **Example:**
+
 ```bash
 export MATCH_PASSWORD="my_secure_password_123"
 ```
 
 **Notes:**
+
 - Use a strong, randomly generated password
 - Same password must be used by all team members
 - Store securely in CI secrets (GitHub Secrets, GitLab CI Variables, etc.)
@@ -42,6 +44,7 @@ export MATCH_PASSWORD="my_secure_password_123"
 **Format:** Any valid Git URL (HTTPS or SSH)
 
 **Example:**
+
 ```bash
 export MATCH_GIT_URL="https://github.com/mycompany/ios-certificates.git"
 export MATCH_GIT_URL="git@github.com:mycompany/ios-certificates.git"
@@ -49,6 +52,7 @@ export MATCH_GIT_URL="https://gitlab.com/mycompany/ios-certificates.git"
 ```
 
 **Notes:**
+
 - Repository can be private (recommended)
 - Must have read access for CI builds
 - Must have write access for certificate creation/update
@@ -69,6 +73,7 @@ export MATCH_GIT_URL="https://gitlab.com/mycompany/ios-certificates.git"
 **Default:** `"master"`
 
 **Example:**
+
 ```bash
 export MATCH_GIT_BRANCH="main"
 export MATCH_GIT_BRANCH="develop"
@@ -76,6 +81,7 @@ export MATCH_GIT_BRANCH="staging"
 ```
 
 **Use Cases:**
+
 - Use different branches for different environments (dev, staging, production)
 - Separate certificate management for different teams
 - Maintain multiple certificate sets within one repository
@@ -93,16 +99,19 @@ export MATCH_GIT_BRANCH="staging"
 **Format:** 10-character alphanumeric string
 
 **Example:**
+
 ```bash
 export MATCH_TEAM_ID="ABC123DEF4"
 ```
 
 **How to Find:**
+
 1. Log in to [Apple Developer Portal](https://developer.apple.com/account)
 2. Navigate to Membership section
 3. Find "Team ID" in the membership details
 
 **Notes:**
+
 - Required for certificate operations via App Store Connect API
 - Used to filter certificates and profiles for your team
 - Same team ID is used across all your iOS/macOS apps
@@ -120,17 +129,20 @@ export MATCH_TEAM_ID="ABC123DEF4"
 **Default:** `false`
 
 **Example:**
+
 ```bash
 export MATCH_READONLY="true"   # CI builds (don't create new certificates)
 export MATCH_READONLY="false"  # Local development (can create certificates)
 ```
 
 **Use Cases:**
+
 - **CI/CD environments:** Set to `true` to ensure builds only use existing certificates
 - **Production pipelines:** Prevent accidental certificate creation
 - **Readonly access:** When team members should only consume certificates, not create them
 
 **Behavior:**
+
 - When `true`: Throws error if certificates/profiles don't exist
 - When `false`: Creates new certificates/profiles if needed (requires App Store Connect API credentials)
 
@@ -147,16 +159,19 @@ export MATCH_READONLY="false"  # Local development (can create certificates)
 **Default:** `false`
 
 **Example:**
+
 ```bash
 export MATCH_FORCE_FOR_NEW_DEVICES="true"
 ```
 
 **Use Cases:**
+
 - After registering new test devices
 - When adding devices to ad-hoc or development profiles
 - Ensures newly registered devices are included in provisioning profiles
 
 **Behavior:**
+
 - When `true`: Regenerates provisioning profiles to include newly registered devices
 - When `false`: Uses existing provisioning profiles without modification
 
@@ -175,6 +190,7 @@ export MATCH_FORCE_FOR_NEW_DEVICES="true"
 **Format:** Base64 encoded "username:password" or "username:token"
 
 **Example:**
+
 ```bash
 # Encode credentials
 echo -n "username:password" | base64
@@ -184,16 +200,19 @@ export MATCH_GIT_BASIC_AUTHORIZATION="dXNlcm5hbWU6cGFzc3dvcmQ="
 ```
 
 **Use Cases:**
+
 - Private Git repositories requiring authentication
 - CI environments without SSH key access
 - Using personal access tokens instead of passwords
 
 **Alternatives:**
+
 - SSH keys (preferred for production)
 - Deploy keys (for CI/CD)
 - OAuth tokens (for GitHub, GitLab)
 
 **Security:**
+
 - Store encoded value in CI secrets
 - Use personal access tokens instead of passwords
 - Limit token scope to repository access only
@@ -215,11 +234,13 @@ These variables are required for operations that interact with App Store Connect
 **Format:** 10-character alphanumeric string (e.g., "ABC123XYZ9")
 
 **Example:**
+
 ```bash
 export APP_STORE_CONNECT_API_KEY_ID="ABC123XYZ9"
 ```
 
 **How to Create:**
+
 1. Log in to [App Store Connect](https://appstoreconnect.apple.com)
 2. Navigate to Users and Access > Keys
 3. Click "+" to generate new API key
@@ -228,6 +249,7 @@ export APP_STORE_CONNECT_API_KEY_ID="ABC123XYZ9"
 6. Note the Key ID
 
 **Notes:**
+
 - Required together with `APP_STORE_CONNECT_API_ISSUER_ID` and `APP_STORE_CONNECT_API_KEY_PATH`
 - Key ID is visible in App Store Connect
 - Cannot be changed after key creation
@@ -245,16 +267,19 @@ export APP_STORE_CONNECT_API_KEY_ID="ABC123XYZ9"
 **Format:** UUID string (8-4-4-4-12 format)
 
 **Example:**
+
 ```bash
 export APP_STORE_CONNECT_API_ISSUER_ID="12345678-1234-1234-1234-123456789012"
 ```
 
 **How to Find:**
+
 1. Log in to [App Store Connect](https://appstoreconnect.apple.com)
 2. Navigate to Users and Access > Keys
 3. Find "Issuer ID" at the top of the page
 
 **Notes:**
+
 - Same for all API keys in your organization
 - UUID format identifier
 - Required together with Key ID and private key
@@ -272,6 +297,7 @@ export APP_STORE_CONNECT_API_ISSUER_ID="12345678-1234-1234-1234-123456789012"
 **Format:** Absolute or relative path to .p8 file
 
 **Example:**
+
 ```bash
 export APP_STORE_CONNECT_API_KEY_PATH="/path/to/AuthKey_ABC123XYZ9.p8"
 export APP_STORE_CONNECT_API_KEY_PATH="./AuthKey.p8"
@@ -280,6 +306,7 @@ export APP_STORE_CONNECT_API_KEY_PATH="${HOME}/.appstoreconnect/AuthKey.p8"
 
 **File Format:**
 The .p8 file is a PEM-encoded PKCS#8 private key:
+
 ```
 -----BEGIN PRIVATE KEY-----
 MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQg...
@@ -287,12 +314,14 @@ MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQg...
 ```
 
 **Security:**
+
 - Never commit .p8 files to version control
 - Store securely (CI secrets, credential managers)
 - Restrict file permissions (e.g., `chmod 600 AuthKey.p8`)
 - Can only download once from App Store Connect
 
 **CI Setup:**
+
 ```bash
 # Store key content in CI secret as base64
 echo "$APP_STORE_CONNECT_API_KEY_BASE64" | base64 -d > AuthKey.p8
@@ -311,6 +340,7 @@ When both environment variables and explicit parameters are provided to `match()
 3. **Default values** (lowest priority)
 
 **Example:**
+
 ```swift
 // This uses the explicit gitUrl, overriding MATCH_GIT_URL
 match(
@@ -514,21 +544,27 @@ security_measures[6]{measure,implementation}:
 ### Common Issues
 
 **Issue:** `Missing environment variable: MATCH_PASSWORD`
+
 - **Solution:** Set `MATCH_PASSWORD` environment variable
 
 **Issue:** `Git clone failed: authentication failed`
+
 - **Solution:** Check Git credentials, ensure repository access, verify `MATCH_GIT_URL`
 
 **Issue:** `Invalid password - decryption failed`
+
 - **Solution:** Verify `MATCH_PASSWORD` matches the password used to encrypt certificates
 
 **Issue:** `App Store Connect API authentication failed`
+
 - **Solution:** Verify all three API variables are set correctly (Key ID, Issuer ID, Key Path)
 
 **Issue:** `File not found: /path/to/AuthKey.p8`
+
 - **Solution:** Verify `APP_STORE_CONNECT_API_KEY_PATH` points to valid .p8 file
 
 **Issue:** `Cannot create certificates in readonly mode`
+
 - **Solution:** Set `MATCH_READONLY="false"` or create certificates manually first
 
 ### Debugging Environment Variables

@@ -1,13 +1,13 @@
-import Testing
 import Foundation
 @testable import LanerMatch
+import Testing
 
 @Suite("CryptoService Tests")
 struct CryptoServiceTests {
     let service = CryptoService()
 
     @Test("Encrypt and decrypt roundtrip with simple data")
-    func testEncryptDecryptRoundtrip() async throws {
+    func encryptDecryptRoundtrip() async throws {
         let originalData = "Hello, Laner Match!".data(using: .utf8)!
         let password = "test_password_123"
 
@@ -18,7 +18,7 @@ struct CryptoServiceTests {
     }
 
     @Test("Encrypt and decrypt roundtrip with empty data")
-    func testEncryptDecryptEmptyData() async throws {
+    func encryptDecryptEmptyData() async throws {
         let originalData = Data()
         let password = "test_password_123"
 
@@ -26,11 +26,11 @@ struct CryptoServiceTests {
         let decrypted = try await service.decrypt(data: encrypted, password: password)
 
         #expect(decrypted == originalData)
-        #expect(decrypted.count == 0)
+        #expect(decrypted.isEmpty)
     }
 
     @Test("Encrypt and decrypt roundtrip with binary data")
-    func testEncryptDecryptBinaryData() async throws {
+    func encryptDecryptBinaryData() async throws {
         // Create some binary data
         let originalData = Data([0x00, 0x01, 0x02, 0xFF, 0xFE, 0xFD, 0x48, 0x65, 0x6C, 0x6C, 0x6F])
         let password = "binary_test_password"
@@ -42,9 +42,9 @@ struct CryptoServiceTests {
     }
 
     @Test("Encrypt and decrypt roundtrip with large data")
-    func testEncryptDecryptLargeData() async throws {
+    func encryptDecryptLargeData() async throws {
         // Create 1MB of random data
-        let originalData = Data((0..<1024*1024).map { _ in UInt8.random(in: 0...255) })
+        let originalData = Data((0 ..< 1024 * 1024).map { _ in UInt8.random(in: 0 ... 255) })
         let password = "large_data_password"
 
         let encrypted = try await service.encrypt(data: originalData, password: password)
@@ -54,7 +54,7 @@ struct CryptoServiceTests {
     }
 
     @Test("Decrypt with wrong password throws invalidPassword error")
-    func testDecryptWithWrongPassword() async throws {
+    func decryptWithWrongPassword() async throws {
         let originalData = "Secret data".data(using: .utf8)!
         let correctPassword = "correct_password"
         let wrongPassword = "wrong_password"
@@ -72,7 +72,7 @@ struct CryptoServiceTests {
     }
 
     @Test("Decrypt with modified ciphertext throws error")
-    func testDecryptWithModifiedCiphertext() async throws {
+    func decryptWithModifiedCiphertext() async throws {
         let originalData = "Tamper test data".data(using: .utf8)!
         let password = "test_password"
 
@@ -93,14 +93,14 @@ struct CryptoServiceTests {
     }
 
     @Test("Decrypt with too short data throws decryptionFailed error")
-    func testDecryptWithTooShortData() async throws {
+    func decryptWithTooShortData() async throws {
         let tooShortData = Data([0x01, 0x02, 0x03]) // Only 3 bytes, need at least 44
         let password = "test_password"
 
         do {
             _ = try await service.decrypt(data: tooShortData, password: password)
             Issue.record("Expected decryptionFailed error to be thrown")
-        } catch MatchError.decryptionFailed(let message) {
+        } catch let MatchError.decryptionFailed(message) {
             #expect(message.contains("Invalid encrypted data: too short"))
         } catch {
             Issue.record("Expected decryptionFailed error, got \(error)")
@@ -108,7 +108,7 @@ struct CryptoServiceTests {
     }
 
     @Test("Encrypted data has correct format structure")
-    func testEncryptedDataFormat() async throws {
+    func encryptedDataFormat() async throws {
         let originalData = "Format test".data(using: .utf8)!
         let password = "test_password"
 
@@ -122,7 +122,7 @@ struct CryptoServiceTests {
     }
 
     @Test("Same data with different passwords produces different ciphertext")
-    func testDifferentPasswordsDifferentCiphertext() async throws {
+    func differentPasswordsDifferentCiphertext() async throws {
         let originalData = "Same data".data(using: .utf8)!
         let password1 = "password_one"
         let password2 = "password_two"
@@ -142,7 +142,7 @@ struct CryptoServiceTests {
     }
 
     @Test("Multiple encryptions of same data produce different ciphertexts")
-    func testMultipleEncryptionsDifferentCiphertexts() async throws {
+    func multipleEncryptionsDifferentCiphertexts() async throws {
         let originalData = "Deterministic test".data(using: .utf8)!
         let password = "same_password"
 
@@ -161,7 +161,7 @@ struct CryptoServiceTests {
     }
 
     @Test("Decrypt with corrupt salt section")
-    func testDecryptWithCorruptSalt() async throws {
+    func decryptWithCorruptSalt() async throws {
         let originalData = "Salt corruption test".data(using: .utf8)!
         let password = "test_password"
 
@@ -182,7 +182,7 @@ struct CryptoServiceTests {
     }
 
     @Test("Decrypt with corrupt nonce section")
-    func testDecryptWithCorruptNonce() async throws {
+    func decryptWithCorruptNonce() async throws {
         let originalData = "Nonce corruption test".data(using: .utf8)!
         let password = "test_password"
 
@@ -203,7 +203,7 @@ struct CryptoServiceTests {
     }
 
     @Test("Decrypt with corrupt tag section")
-    func testDecryptWithCorruptTag() async throws {
+    func decryptWithCorruptTag() async throws {
         let originalData = "Tag corruption test".data(using: .utf8)!
         let password = "test_password"
 
@@ -224,7 +224,7 @@ struct CryptoServiceTests {
     }
 
     @Test("Password with special characters")
-    func testPasswordWithSpecialCharacters() async throws {
+    func passwordWithSpecialCharacters() async throws {
         let originalData = "Special chars test".data(using: .utf8)!
         let password = "p@ssw0rd!#$%^&*()_+-=[]{}|;':\",./<>?`~"
 
@@ -235,7 +235,7 @@ struct CryptoServiceTests {
     }
 
     @Test("Password with Unicode characters")
-    func testPasswordWithUnicodeCharacters() async throws {
+    func passwordWithUnicodeCharacters() async throws {
         let originalData = "Unicode test".data(using: .utf8)!
         let password = "пароль密码🔐🔑"
 
@@ -246,7 +246,7 @@ struct CryptoServiceTests {
     }
 
     @Test("Very long password")
-    func testVeryLongPassword() async throws {
+    func veryLongPassword() async throws {
         let originalData = "Long password test".data(using: .utf8)!
         let password = String(repeating: "a", count: 1000)
 
@@ -257,7 +257,7 @@ struct CryptoServiceTests {
     }
 
     @Test("Data with only null bytes")
-    func testDataWithNullBytes() async throws {
+    func dataWithNullBytes() async throws {
         let originalData = Data(repeating: 0x00, count: 100)
         let password = "null_bytes_password"
 

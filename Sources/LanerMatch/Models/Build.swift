@@ -45,9 +45,9 @@ public struct Build: Codable, Sendable, Equatable {
 
 // MARK: - ProcessingState
 
-extension Build {
+public extension Build {
     /// The processing state of a build.
-    public enum ProcessingState: String, Codable, Sendable, Equatable {
+    enum ProcessingState: String, Codable, Sendable, Equatable {
         /// The build is being processed by Apple.
         case processing = "PROCESSING"
 

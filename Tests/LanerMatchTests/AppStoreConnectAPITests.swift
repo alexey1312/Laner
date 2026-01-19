@@ -1,12 +1,11 @@
-import Testing
 import Foundation
 @testable import LanerMatch
+import Testing
 
 @Suite("App Store Connect API Tests")
 struct AppStoreConnectAPITests {
-
     @Test("JWT token generation with valid key")
-    func testJWTTokenGeneration() throws {
+    func jWTTokenGeneration() throws {
         // Sample P-256 private key (test key, not real)
         let privateKey = """
         -----BEGIN PRIVATE KEY-----
@@ -32,7 +31,7 @@ struct AppStoreConnectAPITests {
         let headerData = Data(base64URLEncoded: String(components[0]))
         #expect(headerData != nil, "Header should be valid base64")
 
-        if let headerData = headerData {
+        if let headerData {
             let header = try JSONDecoder().decode(JWTHeader.self, from: headerData)
             #expect(header.alg == "ES256")
             #expect(header.kid == "TEST_KEY_ID")
@@ -43,7 +42,7 @@ struct AppStoreConnectAPITests {
         let payloadData = Data(base64URLEncoded: String(components[1]))
         #expect(payloadData != nil, "Payload should be valid base64")
 
-        if let payloadData = payloadData {
+        if let payloadData {
             let payload = try JSONDecoder().decode(JWTPayload.self, from: payloadData)
             #expect(payload.iss == "TEST_ISSUER_ID")
             #expect(payload.aud == "appstoreconnect-v1")
@@ -56,7 +55,7 @@ struct AppStoreConnectAPITests {
     }
 
     @Test("JWT token generation with .p8 format key")
-    func testJWTTokenGenerationP8Format() throws {
+    func jWTTokenGenerationP8Format() throws {
         // Sample key without PEM headers (like .p8 files)
         let privateKey = """
         MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgPGJGAm4X1fvBuC1z
@@ -75,7 +74,7 @@ struct AppStoreConnectAPITests {
     }
 
     @Test("JWT token generation fails with invalid key")
-    func testJWTTokenGenerationInvalidKey() {
+    func jWTTokenGenerationInvalidKey() {
         let invalidKey = "not-a-valid-key"
 
         #expect(throws: MatchError.self) {
@@ -88,7 +87,7 @@ struct AppStoreConnectAPITests {
     }
 
     @Test("Multiple token generations produce different tokens")
-    func testMultipleTokenGenerations() async throws {
+    func multipleTokenGenerations() async throws {
         let privateKey = """
         -----BEGIN PRIVATE KEY-----
         MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgPGJGAm4X1fvBuC1z

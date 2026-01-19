@@ -1,6 +1,6 @@
-import Testing
-import Logging
 @testable import LanerKit
+import Logging
+import Testing
 
 @Suite("Logging Tests")
 struct LoggingTests {

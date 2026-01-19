@@ -1,5 +1,5 @@
-import Testing
 @testable import LanerKit
+import Testing
 
 @Suite("ProcessResult Tests")
 struct ProcessResultTests {

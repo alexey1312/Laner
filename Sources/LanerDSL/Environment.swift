@@ -41,7 +41,7 @@ public struct Environment: Sendable {
     ) {
         self.variables = variables
         self.workingDirectory = workingDirectory
-        (self.isCI, self.ciProvider) = Self.detectCI(from: variables)
+        (isCI, ciProvider) = Self.detectCI(from: variables)
     }
 
     /// Accesses an environment variable by name.
@@ -169,8 +169,8 @@ public enum EnvironmentError: Error, LocalizedError {
 
     public var errorDescription: String? {
         switch self {
-        case .missingVariable(let name):
-            return "Required environment variable '\(name)' is not set"
+        case let .missingVariable(name):
+            "Required environment variable '\(name)' is not set"
         }
     }
 }

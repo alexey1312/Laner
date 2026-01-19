@@ -1,8 +1,11 @@
 # manifest-compiler Specification
 
 ## Purpose
+
 TBD - created by archiving change add-lane-execution. Update Purpose after archive.
+
 ## Requirements
+
 ### Requirement: Manifest Discovery
 
 The system SHALL discover Lanerfile.swift in project directory.
@@ -135,4 +138,3 @@ The system MUST generate valid Swift package for compilation.
 - **THEN** wrapper imports LanerDSL and Foundation
 - **AND** wrapper encodes laner to JSON
 - **AND** wrapper prints JSON to stdout
-

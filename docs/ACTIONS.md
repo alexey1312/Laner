@@ -55,21 +55,25 @@ Match can be configured via:
 ### Examples
 
 **Basic usage:**
+
 ```swift
 match(type: .appstore, appIdentifier: "com.example.app")
 ```
 
 **Readonly mode:**
+
 ```swift
 match(type: .appstore, appIdentifier: "com.example.app", readonly: true)
 ```
 
 **Force regeneration for new devices:**
+
 ```swift
 match(type: .adhoc, forceForNewDevices: true)
 ```
 
 **Custom Git repository:**
+
 ```swift
 match(
     type: .distribution,
@@ -79,6 +83,7 @@ match(
 ```
 
 **Multiple apps:**
+
 ```swift
 lane("sign_all") {
     match(type: .appstore, appIdentifier: "com.example.app")
@@ -99,11 +104,13 @@ The `registerDevices()` action registers devices with the Apple Developer Portal
 ### Usage
 
 **From file:**
+
 ```swift
 registerDevices(file: "devices.txt")
 ```
 
 **From dictionary:**
+
 ```swift
 registerDevices(devices: [
     "John's iPhone": "00008030-001234567890401E",
@@ -135,6 +142,7 @@ Lines starting with `#` are treated as comments and ignored.
 ### Examples
 
 **Register devices and sync ad-hoc profiles:**
+
 ```swift
 lane("adhoc") {
     registerDevices(file: "devices.txt")
@@ -144,11 +152,13 @@ lane("adhoc") {
 ```
 
 **Register specific platform:**
+
 ```swift
 registerDevices(file: "macs.txt", platform: .macOS)
 ```
 
 **Register with explicit credentials:**
+
 ```swift
 registerDevices(
     devices: ["Test iPhone": "00008030-001234567890401E"],

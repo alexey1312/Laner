@@ -5,6 +5,7 @@
 **Laner** — an open-source Swift CLI tool for iOS CI/CD, fully replacing Fastlane.
 
 **Goals:**
+
 - Eliminate Ruby dependency
 - Speed up CI pipelines
 - Type-safe configuration via Swift DSL
@@ -100,6 +101,7 @@ let laner = Lanerfile(
 **Goal:** Basic CLI with xcodebuild wrapper
 
 **Deliverables:**
+
 1. Swift Package structure
 2. ArgumentParser integration
 3. `ShellExecutor` — async process runner
@@ -107,6 +109,7 @@ let laner = Lanerfile(
 5. Basic commands: `laner build`, `laner test`
 
 **Key Files:**
+
 ```swift
 // ShellExecutor.swift
 actor ShellExecutor {
@@ -123,6 +126,7 @@ struct XcodebuildExecutor {
 ```
 
 **Dependencies:**
+
 - `apple/swift-argument-parser` — CLI parsing
 - `apple/swift-log` — logging
 
@@ -133,6 +137,7 @@ struct XcodebuildExecutor {
 **Goal:** Swift DSL for lane configuration
 
 **Deliverables:**
+
 1. `LanerDSL` module with result builders
 2. `Lane` protocol and `@LaneBuilder`
 3. Actions API (gym, scan, match, etc.)
@@ -140,6 +145,7 @@ struct XcodebuildExecutor {
 5. Lanerfile compilation & execution
 
 **Key Pattern — Result Builder:**
+
 ```swift
 @resultBuilder
 struct LaneBuilder {
@@ -173,6 +179,7 @@ struct Lane {
 **Goal:** Full replacement for fastlane match
 
 **Deliverables:**
+
 1. Git-based certificate storage
 2. AES-256 encryption/decryption (CryptoKit)
 3. Keychain integration
@@ -180,6 +187,7 @@ struct Lane {
 5. Device registration via App Store Connect API
 
 **Architecture:**
+
 ```swift
 struct MatchService {
     let git: GitRepository
@@ -200,6 +208,7 @@ struct CryptoService {
 ```
 
 **Dependencies:**
+
 - `CryptoKit` (built-in)
 - `Security.framework` for Keychain
 
@@ -210,12 +219,14 @@ struct CryptoService {
 **Goal:** Upload to TestFlight, manage builds
 
 **Deliverables:**
+
 1. JWT authentication
 2. Build upload (altool/iTMSTransporter wrapper)
 3. Build management API
 4. TestFlight distribution
 
 **Key Integration:**
+
 ```swift
 struct AppStoreConnectAPI {
     let credentials: APICredentials
@@ -236,6 +247,7 @@ struct AppStoreConnectAPI {
 **Goal:** Upload to Firebase
 
 **Deliverables:**
+
 1. Firebase CLI wrapper OR REST API integration
 2. Release notes generation
 3. Tester groups management
@@ -253,6 +265,7 @@ struct FirebaseDistributionService {
 **Goal:** Jira, Slack notifications
 
 **Deliverables:**
+
 1. Jira REST API integration
 2. Slack webhook support
 3. Generic webhook support
@@ -274,6 +287,7 @@ struct SlackNotificationService: NotificationService { }
 **Goal:** Build time tracking, size metrics
 
 **Deliverables:**
+
 1. Build timing instrumentation
 2. IPA size tracking
 3. Telemetry API integration
@@ -286,6 +300,7 @@ struct SlackNotificationService: NotificationService { }
 **Goal:** Production-ready release
 
 **Deliverables:**
+
 1. Comprehensive documentation
 2. Example Lanerfiles
 3. Migration guide from Fastlane
@@ -294,13 +309,13 @@ struct SlackNotificationService: NotificationService { }
 
 ## Dependencies
 
-| Package | Version | Purpose | Linux Support |
-|---------|---------|---------|---------------|
-| swift-argument-parser | 1.3+ | CLI argument parsing | Yes |
-| swift-log | 1.5+ | Structured logging | Yes |
-| swift-crypto | 3.0+ | Encryption (replaces CryptoKit on Linux) | Yes |
-| async-http-client | 1.19+ | HTTP requests | Yes |
-| Yams | 5.0+ | YAML parsing | Yes |
+| Package               | Version | Purpose                                  | Linux Support |
+| --------------------- | ------- | ---------------------------------------- | ------------- |
+| swift-argument-parser | 1.3+    | CLI argument parsing                     | Yes           |
+| swift-log             | 1.5+    | Structured logging                       | Yes           |
+| swift-crypto          | 3.0+    | Encryption (replaces CryptoKit on Linux) | Yes           |
+| async-http-client     | 1.19+   | HTTP requests                            | Yes           |
+| Yams                  | 5.0+    | YAML parsing                             | Yes           |
 
 ## Linux Support Strategy
 
@@ -324,15 +339,15 @@ import Crypto  // swift-crypto
 
 ### Feature Availability by Platform
 
-| Feature | macOS | Linux |
-|---------|-------|-------|
-| Build/Test (xcodebuild) | Yes | No (macOS only) |
-| Swift Package build | Yes | Yes |
-| App Store Connect API | Yes | Yes |
-| Firebase upload | Yes | Yes |
-| Match (certificates) | Yes | No (Keychain required) |
-| Notifications (Jira/Slack) | Yes | Yes |
-| Metrics/Telemetry | Yes | Yes |
+| Feature                    | macOS | Linux                  |
+| -------------------------- | ----- | ---------------------- |
+| Build/Test (xcodebuild)    | Yes   | No (macOS only)        |
+| Swift Package build        | Yes   | Yes                    |
+| App Store Connect API      | Yes   | Yes                    |
+| Firebase upload            | Yes   | Yes                    |
+| Match (certificates)       | Yes   | No (Keychain required) |
+| Notifications (Jira/Slack) | Yes   | Yes                    |
+| Metrics/Telemetry          | Yes   | Yes                    |
 
 ### Linux Use Cases
 
@@ -343,7 +358,7 @@ import Crypto  // swift-crypto
 
 ### Conditional Compilation
 
-```swift
+````swift
 // Package.swift
 let package = Package(
     name: "laner",
@@ -401,16 +416,18 @@ laner my_custom_lane           # Any custom lane
 laner init                     # Generate Lanerfile.swift
 laner doctor                   # Check environment
 laner lanes                    # List available lanes
-```
+````
 
 ## Migration Strategy from Fastlane
 
 ### Step 1: Parallel Operation
+
 - Keep existing Fastfile
 - Add `Laner/Lanerfile.swift` alongside
 - Gradually migrate lanes one by one
 
 ### Step 2: CI Integration
+
 ```yaml
 # GitHub Actions
 - name: Build with Laner
@@ -420,6 +437,7 @@ laner lanes                    # List available lanes
 ```
 
 ### Step 3: Full Migration
+
 - Remove Fastfile, Gemfile, fastlane/
 - Update CI workflows
 - Update documentation
@@ -433,12 +451,12 @@ laner lanes                    # List available lanes
 
 ## Risks & Mitigations
 
-| Risk | Mitigation |
-|------|------------|
-| Match encryption compatibility | Use same AES-256-GCM algorithm |
-| App Store Connect API changes | Abstract behind protocol, easy to update |
-| Large initial investment | Phased approach, MVP first |
-| Missing edge cases | Extensive testing against real projects |
+| Risk                           | Mitigation                               |
+| ------------------------------ | ---------------------------------------- |
+| Match encryption compatibility | Use same AES-256-GCM algorithm           |
+| App Store Connect API changes  | Abstract behind protocol, easy to update |
+| Large initial investment       | Phased approach, MVP first               |
+| Missing edge cases             | Extensive testing against real projects  |
 
 ## Plugin Architecture
 
@@ -642,27 +660,27 @@ let package = Package(
 ### Module Dependency Graph
 
 ```
-                    ┌──────────────┐
-                    │   laner  │  (CLI executable)
-                    └──────┬───────┘
-                           │
-                    ┌──────▼───────┐
-                    │LanerCore │  (Internal logic)
-                    └──────┬───────┘
-                           │
-          ┌────────────────┼────────────────┐
-          │                │                │
-   ┌──────▼──────┐  ┌──────▼──────┐  ┌──────▼──────┐
-   │LanerDSL │  │PluginKit   │  │LanerKit │
-   └─────────────┘  └─────────────┘  └─────────────┘
-          │                │
-          └────────┬───────┘
-                   │
-        ┌──────────▼──────────┐
-        │   User Plugins      │
-        │ (LanerFirebase, │
-        │  LanerMatch...) │
-        └─────────────────────┘
+                 ┌──────────────┐
+                 │   laner  │  (CLI executable)
+                 └──────┬───────┘
+                        │
+                 ┌──────▼───────┐
+                 │LanerCore │  (Internal logic)
+                 └──────┬───────┘
+                        │
+       ┌────────────────┼────────────────┐
+       │                │                │
+┌──────▼──────┐  ┌──────▼──────┐  ┌──────▼──────┐
+│LanerDSL │  │PluginKit   │  │LanerKit │
+└─────────────┘  └─────────────┘  └─────────────┘
+       │                │
+       └────────┬───────┘
+                │
+     ┌──────────▼──────────┐
+     │   User Plugins      │
+     │ (LanerFirebase, │
+     │  LanerMatch...) │
+     └─────────────────────┘
 ```
 
 ### Core Protocols
@@ -827,14 +845,17 @@ jira(ticket:comment:)
 ### Danger Swift Architecture ([source](https://danger.systems/swift/tutorials/architecture))
 
 **"Swift sandwich":** Danger JS -> Danger Swift -> Danger JS
+
 - Danger JS handles CI/platform detection (GitHub, GitLab, BitBucket)
 - Swift only processes rules
 - JSON as transport between layers
 
 **Plugin approach** ([source](https://danger.systems/swift/usage/extending_danger.html)):
+
 - No protocol — just public functions
 - Plugin = SPM package that imports `Danger` and exports functions
 - Minimal abstraction:
+
 ```swift
 public func checkForCopyrightHeaders() {
     let danger = Danger()
@@ -844,18 +865,19 @@ public func checkForCopyrightHeaders() {
 
 ### Why Laner Differs
 
-| Aspect | Danger Swift | Laner |
-|--------|--------------|-----------|
-| **Dependency** | Requires Danger JS (Node.js) | Fully autonomous Swift |
-| **Plugin system** | Simple functions | Protocol + Registry |
-| **Type safety** | Runtime | Compile-time |
-| **Lifecycle hooks** | Limited | Full (beforeAll, afterAll, onError) |
-| **Plugin discovery** | Manual import | Automatic registration |
-| **Testability** | Harder to mock | Protocol-based DI |
+| Aspect               | Danger Swift                 | Laner                               |
+| -------------------- | ---------------------------- | ----------------------------------- |
+| **Dependency**       | Requires Danger JS (Node.js) | Fully autonomous Swift              |
+| **Plugin system**    | Simple functions             | Protocol + Registry                 |
+| **Type safety**      | Runtime                      | Compile-time                        |
+| **Lifecycle hooks**  | Limited                      | Full (beforeAll, afterAll, onError) |
+| **Plugin discovery** | Manual import                | Automatic registration              |
+| **Testability**      | Harder to mock               | Protocol-based DI                   |
 
 ### Decision: Protocol + Registry
 
 **Rationale:**
+
 1. **Compile-time guarantees** — plugins must conform to `LanerPlugin`
 2. **Discoverability** — `laner plugins list` shows all registered actions
 3. **Testability** — protocol-based design enables mocking

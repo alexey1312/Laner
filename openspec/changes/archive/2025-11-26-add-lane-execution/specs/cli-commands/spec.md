@@ -93,6 +93,7 @@ The system SHALL provide a `lanes` command to list available lanes.
 - **GIVEN** Lanerfile.swift with lanes "build", "test", "deploy"
 - **WHEN** user runs `laner lanes`
 - **THEN** output shows:
+
 ```
 Available lanes:
   build   - Build the application

@@ -1,5 +1,5 @@
-import Testing
 @testable import LanerKit
+import Testing
 
 @Suite("ShellError Tests")
 struct ShellErrorTests {

@@ -49,7 +49,7 @@ let registerLane = Lane(name: "register") {
     registerDevices(devices: [
         "John's iPhone": "00008030-001234567890401E",
         "Jane's iPad": "00008101-000123456789012E",
-        "Test Device": "00008020-001A1B2C3D4E501F"
+        "Test Device": "00008020-001A1B2C3D4E501F",
     ])
 }
 

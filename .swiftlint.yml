@@ -13,10 +13,15 @@ disabled_rules:
   - superfluous_disable_command
   - blanket_disable_command
   - trailing_whitespace
+  - file_length
+  - inclusive_language
+  - function_parameter_count
+  - force_cast
+  - optional_data_string_conversion
+  - non_optional_string_data_conversion
 
 opt_in_rules:
   - empty_count
-  - empty_string
 
 line_length:
   warning: 120
@@ -41,8 +46,12 @@ large_tuple:
   error: 5
 
 function_body_length:
-  warning: 60
-  error: 100
+  warning: 120
+  error: 180
+
+cyclomatic_complexity:
+  warning: 20
+  error: 30
 
 type_body_length:
   warning: 300

@@ -1,7 +1,7 @@
 import ArgumentParser
 import Foundation
-import Logging
 import LanerKit
+import Logging
 
 /// Initializes a new Laner project by creating the configuration directory and template file.
 public struct InitCommand: AsyncParsableCommand {
@@ -35,7 +35,7 @@ public struct InitCommand: AsyncParsableCommand {
             isDirectory: &isDirectory
         )
 
-        if lanerDirExists && isDirectory.boolValue {
+        if lanerDirExists, isDirectory.boolValue {
             logger.debug("Laner/ directory already exists")
         }
 
@@ -46,7 +46,7 @@ public struct InitCommand: AsyncParsableCommand {
             isDirectory: &isFile
         )
 
-        if lanerfileExists && !force {
+        if lanerfileExists, !force {
             logger.error("Lanerfile.swift already exists")
             print("Error: Lanerfile.swift already exists. Use --force to overwrite.")
             throw ExitCode.failure
@@ -85,7 +85,7 @@ public struct InitCommand: AsyncParsableCommand {
 
     /// Generates the Lanerfile.swift template content.
     private func generateLanerfileTemplate() -> String {
-        return """
+        """
         // Laner/Lanerfile.swift
         import LanerDSL
 

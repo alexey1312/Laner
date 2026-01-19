@@ -1,6 +1,6 @@
 import Foundation
-import Logging
 import LanerKit
+import Logging
 
 /// Provides the execution environment for actions within a lane.
 ///
@@ -27,7 +27,7 @@ import LanerKit
 /// }
 /// ```
 @MainActor
-public final class ExecutionContext: Sendable {
+public final class ExecutionContext {
     /// The execution environment with CI detection and environment variables.
     public let environment: Environment
 
@@ -71,9 +71,9 @@ public final class ExecutionContext: Sendable {
     ) {
         self.environment = environment
         self.logger = logger
-        self._fileManager = fileManager
+        _fileManager = fileManager
         self.shell = shell
-        self.artifacts = ArtifactStore()
+        artifacts = ArtifactStore()
         self.workingDirectory = workingDirectory ?? environment.workingDirectory
         self.parameters = parameters
     }
@@ -145,10 +145,10 @@ public enum ContextError: Error, LocalizedError {
 
     public var errorDescription: String? {
         switch self {
-        case .missingParameter(let key):
-            return "Required parameter '\(key)' is not provided"
-        case .invalidParameterType(let key, let expected, let actual):
-            return "Parameter '\(key)' has type '\(actual)' but expected '\(expected)'"
+        case let .missingParameter(key):
+            "Required parameter '\(key)' is not provided"
+        case let .invalidParameterType(key, expected, actual):
+            "Parameter '\(key)' has type '\(actual)' but expected '\(expected)'"
         }
     }
 }

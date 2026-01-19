@@ -72,17 +72,17 @@ laner lane build
 
 ## Commands
 
-| Command             | Description                              |
-|---------------------|------------------------------------------|
-| `version`           | Show Laner version and environment       |
-| `doctor`            | Check environment for required tools     |
-| `init`              | Initialize a new Laner project           |
-| `lanes`             | List available lanes from manifest       |
-| `lane <name>`       | Execute a lane by name                   |
-| `build`             | Build an iOS or macOS project            |
-| `test`              | Run tests for an iOS or macOS project    |
+| Command             | Description                                    |
+| ------------------- | ---------------------------------------------- |
+| `version`           | Show Laner version and environment             |
+| `doctor`            | Check environment for required tools           |
+| `init`              | Initialize a new Laner project                 |
+| `lanes`             | List available lanes from manifest             |
+| `lane <name>`       | Execute a lane by name                         |
+| `build`             | Build an iOS or macOS project                  |
+| `test`              | Run tests for an iOS or macOS project          |
 | `match`             | Code signing management (sync, nuke, register) |
-| `upload testflight` | Upload IPA to TestFlight                 |
+| `upload testflight` | Upload IPA to TestFlight                       |
 
 ## DSL Example
 
@@ -127,26 +127,26 @@ let laner = Lanerfile(
 
 ## Environment Variables
 
-| Variable | Description |
-|----------|-------------|
-| `MATCH_PASSWORD` | Encryption password for certificates |
-| `MATCH_GIT_URL` | Git repository URL for certificate storage |
-| `MATCH_TEAM_ID` | Apple Developer Team ID |
-| `APP_STORE_APP_ID` | App Store Connect App ID (for pilot action) |
-| `APP_STORE_CONNECT_API_KEY_ID` | App Store Connect API Key ID |
-| `APP_STORE_CONNECT_API_ISSUER_ID` | App Store Connect Issuer ID |
-| `APP_STORE_CONNECT_API_KEY_PATH` | Path to .p8 private key file |
+| Variable                          | Description                                 |
+| --------------------------------- | ------------------------------------------- |
+| `MATCH_PASSWORD`                  | Encryption password for certificates        |
+| `MATCH_GIT_URL`                   | Git repository URL for certificate storage  |
+| `MATCH_TEAM_ID`                   | Apple Developer Team ID                     |
+| `APP_STORE_APP_ID`                | App Store Connect App ID (for pilot action) |
+| `APP_STORE_CONNECT_API_KEY_ID`    | App Store Connect API Key ID                |
+| `APP_STORE_CONNECT_API_ISSUER_ID` | App Store Connect Issuer ID                 |
+| `APP_STORE_CONNECT_API_KEY_PATH`  | Path to .p8 private key file                |
 
 ## Documentation
 
-| Document | Description |
-|----------|-------------|
-| [Usage Guide](docs/USAGE.md) | Step-by-step usage instructions |
-| [Инструкция (RU)](docs/USAGE_RU.md) | Пошаговая инструкция на русском |
-| [Actions Reference](docs/ACTIONS.md) | Available DSL actions and custom action development |
-| [Environment Variables](docs/ENVIRONMENT_VARIABLES.md) | Complete environment variable reference |
-| [Implementation Plan](docs/IMPLEMENTATION_PLAN.md) | Architecture and development roadmap |
-| [Fastlane Analysis](docs/FASTLANE_ANALYSIS.md) | Comparison with Fastlane |
+| Document                                               | Description                                         |
+| ------------------------------------------------------ | --------------------------------------------------- |
+| [Usage Guide](docs/USAGE.md)                           | Step-by-step usage instructions                     |
+| [Инструкция (RU)](docs/USAGE_RU.md)                    | Пошаговая инструкция на русском                     |
+| [Actions Reference](docs/ACTIONS.md)                   | Available DSL actions and custom action development |
+| [Environment Variables](docs/ENVIRONMENT_VARIABLES.md) | Complete environment variable reference             |
+| [Implementation Plan](docs/IMPLEMENTATION_PLAN.md)     | Architecture and development roadmap                |
+| [Fastlane Analysis](docs/FASTLANE_ANALYSIS.md)         | Comparison with Fastlane                            |
 
 ## Development
 

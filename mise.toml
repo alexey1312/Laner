@@ -8,7 +8,7 @@ run = "git config core.hooksPath .githooks 2>/dev/null || true"
 
 [tools]
 swiftformat = "0.58.7"
-swiftlint = "0.63.0"
+swiftlint = "0.63.1"
 xcsift = "1.0.19"
 dprint = "0.50.2"
 hk = "1.28.0"
@@ -37,7 +37,7 @@ actionlint
 
 [tasks."format:swift"]
 description = "Format Swift"
-run = "swiftformat Sources Tests"
+run = "swiftformat Sources Tests Examples"
 
 [tasks."format:md"]
 description = "Format Markdown"

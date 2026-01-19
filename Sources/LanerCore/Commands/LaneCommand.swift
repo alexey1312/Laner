@@ -1,8 +1,8 @@
 import ArgumentParser
 import Foundation
-import Logging
 import LanerDSL
 import LanerKit
+import Logging
 
 /// Executes a named lane from the Lanerfile.
 ///
@@ -50,17 +50,17 @@ public struct LaneCommand: AsyncParsableCommand {
                 print("Error: Lanerfile.swift not found.")
                 print("Run 'laner init' to create a new manifest.")
                 throw ExitCode.failure
-            case .compilationFailed(let output):
+            case let .compilationFailed(output):
                 print("Error: Failed to compile Lanerfile.swift")
                 print("")
                 print(output)
                 throw ExitCode.failure
-            case .executionFailed(let output):
+            case let .executionFailed(output):
                 print("Error: Failed to execute manifest")
                 print("")
                 print(output)
                 throw ExitCode.failure
-            case .invalidOutput(let details):
+            case let .invalidOutput(details):
                 print("Error: Invalid manifest output")
                 print(details)
                 throw ExitCode.failure
@@ -68,7 +68,7 @@ public struct LaneCommand: AsyncParsableCommand {
                 print("Error: Could not determine Laner installation path")
                 print("Ensure Laner is properly installed with lib/laner/ directory.")
                 throw ExitCode.failure
-            case .versionMismatch(let expected, let found):
+            case let .versionMismatch(expected, found):
                 print("Error: DSL version mismatch")
                 print("Binary version: \(expected), bundled DSL version: \(found)")
                 print("Please reinstall Laner to fix this issue.")

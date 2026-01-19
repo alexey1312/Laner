@@ -7,6 +7,7 @@ Code signing management is critical for iOS app distribution. Fastlane Match pio
 **Stakeholders**: iOS developers, CI/CD pipelines, DevOps teams
 
 **Constraints**:
+
 - Must be compatible with existing Fastlane Match repositories
 - Must work on macOS CI runners (GitHub Actions, CircleCI, etc.)
 - Must support App Store Connect API (JWT auth)
@@ -15,6 +16,7 @@ Code signing management is critical for iOS app distribution. Fastlane Match pio
 ## Goals / Non-Goals
 
 **Goals**:
+
 - Sync certificates and provisioning profiles from Git storage
 - Create new certificates via App Store Connect API when needed
 - Install certificates to Keychain on macOS
@@ -23,6 +25,7 @@ Code signing management is critical for iOS app distribution. Fastlane Match pio
 - Register new devices
 
 **Non-Goals** (Phase 1):
+
 - Google Cloud Storage / Amazon S3 support
 - Enterprise certificates
 - Push certificates
@@ -105,11 +108,13 @@ certificates-repo/
 **Decision**: Use AES-256-GCM with password-based key derivation (same as Fastlane Match).
 
 **Rationale**:
+
 - Compatibility with existing Match repositories
 - Standard algorithm supported by swift-crypto
 - GCM provides authentication (AEAD)
 
 **Implementation**:
+
 ```swift
 // Key derivation: PBKDF2-HMAC-SHA256 (10,000 iterations, 32-byte key)
 // Encryption: AES-256-GCM
@@ -121,11 +126,13 @@ certificates-repo/
 **Decision**: Support only Git storage in Phase 1.
 
 **Rationale**:
+
 - Most common use case (90%+ of Fastlane Match users)
 - Simplest to implement and test
 - Protocol-based design allows adding S3/GCS later
 
 **Protocol**:
+
 ```swift
 protocol StorageProvider: Sendable {
     func download(to directory: URL) async throws
@@ -139,11 +146,13 @@ protocol StorageProvider: Sendable {
 **Decision**: Create temporary Keychain for CI, use login Keychain for local dev.
 
 **Rationale**:
+
 - CI should not pollute system Keychain
 - Local dev benefits from persistent certificates
 - Matches Fastlane Match behavior
 
 **Implementation**:
+
 ```swift
 struct KeychainService {
     func install(certificate: Certificate, keychain: Keychain) async throws
@@ -157,11 +166,13 @@ struct KeychainService {
 **Decision**: Use JWT tokens with `.p8` key files for API authentication.
 
 **Rationale**:
+
 - Apple's recommended approach for automation
 - 20-minute token validity (regenerate as needed)
 - No session cookies or 2FA issues
 
 **Configuration**:
+
 ```swift
 struct APICredentials: Codable {
     let keyId: String        // Key ID from App Store Connect
@@ -174,17 +185,18 @@ struct APICredentials: Codable {
 
 **Decision**: Support only iOS certificate types initially.
 
-| Type | Certificate | Provisioning Profile |
-|------|-------------|---------------------|
-| `development` | Apple Development | iOS Development |
-| `adhoc` | Apple Distribution | Ad Hoc |
-| `appstore` | Apple Distribution | App Store |
+| Type          | Certificate        | Provisioning Profile |
+| ------------- | ------------------ | -------------------- |
+| `development` | Apple Development  | iOS Development      |
+| `adhoc`       | Apple Distribution | Ad Hoc               |
+| `appstore`    | Apple Distribution | App Store            |
 
 ### D6: Readonly Mode Default in CI
 
 **Decision**: Default to `readonly: true` in CI environments.
 
 **Rationale**:
+
 - Prevents accidental certificate regeneration in CI
 - Matches Fastlane best practice
 - CI should not modify Git repository
@@ -196,13 +208,13 @@ match(type: .appstore, readonly: false) // explicit write mode
 
 ## Risks / Trade-offs
 
-| Risk | Mitigation |
-|------|------------|
-| Encryption incompatibility with Fastlane | Test against real Match repositories |
-| App Store Connect API rate limits | Cache responses, batch operations |
-| Keychain access denied in CI | Document CI setup (unlock keychain) |
-| Git auth failures in CI | Support multiple auth methods (SSH, token, basic) |
-| Certificate creation failures | Validate bundle ID exists before creating |
+| Risk                                     | Mitigation                                        |
+| ---------------------------------------- | ------------------------------------------------- |
+| Encryption incompatibility with Fastlane | Test against real Match repositories              |
+| App Store Connect API rate limits        | Cache responses, batch operations                 |
+| Keychain access denied in CI             | Document CI setup (unlock keychain)               |
+| Git auth failures in CI                  | Support multiple auth methods (SSH, token, basic) |
+| Certificate creation failures            | Validate bundle ID exists before creating         |
 
 ## API Design
 

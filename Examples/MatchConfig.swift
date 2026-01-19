@@ -140,7 +140,7 @@ let registerDevicesLane = Lane(name: "register_devices") {
         "John's iPhone 15 Pro": "00008030-001234567890401E",
         "Jane's iPad Pro": "00008101-000123456789012E",
         "QA iPhone 14": "00008020-001A1B2C3D4E501F",
-        "Test Device": "00008110-000A0B0C0D0E0F1G"
+        "Test Device": "00008110-000A0B0C0D0E0F1G",
     ])
 }
 
@@ -171,7 +171,7 @@ let addTestDevicesLane = Lane(name: "add_test_devices") {
     // Register new test devices
     registerDevices(devices: [
         "Tester iPhone": "00008030-001234567890401E",
-        "Tester iPad": "00008101-000123456789012E"
+        "Tester iPad": "00008101-000123456789012E",
     ])
 
     // Force regenerate ad-hoc profiles to include new devices
@@ -228,7 +228,7 @@ let ciLane = Lane(name: "ci_build") {
         exportOptions: [
             "uploadBitcode": false,
             "uploadSymbols": true,
-            "compileBitcode": false
+            "compileBitcode": false,
         ]
     )
 }
@@ -315,8 +315,8 @@ let enterpriseOTALane = Lane(name: "enterprise_ota") {
             "manifest": [
                 "appURL": "https://example.com/app.ipa",
                 "displayImageURL": "https://example.com/icon.png",
-                "fullSizeImageURL": "https://example.com/icon.png"
-            ]
+                "fullSizeImageURL": "https://example.com/icon.png",
+            ],
         ]
     )
 }
@@ -376,7 +376,7 @@ struct MyLanerfile: Lanerfile {
 
         // Device management
         registerDevicesLane,
-        registerFromFileLane
+        registerFromFileLane,
     ]
 
     // Default lane
@@ -479,4 +479,4 @@ struct MyLanerfile: Lanerfile {
    APP_STORE_CONNECT_API_ISSUER_ID: $ASC_ISSUER_ID
    APP_STORE_CONNECT_API_KEY_PATH: "./AuthKey.p8"
  ```
-*/
+ */

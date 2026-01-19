@@ -1,5 +1,5 @@
-import Foundation
 import Crypto
+import Foundation
 import LanerKit
 
 /// Represents a cached compiled manifest.
@@ -78,7 +78,8 @@ public struct ManifestCache: Sendable {
         let metadataPath = projectCacheDir.appendingPathComponent(metadataFileName)
         var isDirectory: ObjCBool = false
         guard fileManager.fileExists(atPath: metadataPath.path(percentEncoded: false), isDirectory: &isDirectory),
-              !isDirectory.boolValue else {
+              !isDirectory.boolValue
+        else {
             return nil
         }
 
@@ -89,8 +90,12 @@ public struct ManifestCache: Sendable {
 
         // Verify executable exists
         var execIsDirectory: ObjCBool = false
-        guard fileManager.fileExists(atPath: cachedManifest.executablePath.path(percentEncoded: false), isDirectory: &execIsDirectory),
-              !execIsDirectory.boolValue else {
+        guard fileManager.fileExists(
+            atPath: cachedManifest.executablePath.path(percentEncoded: false),
+            isDirectory: &execIsDirectory
+        ),
+            !execIsDirectory.boolValue
+        else {
             return nil
         }
 
@@ -210,7 +215,7 @@ public struct ManifestCache: Sendable {
 
         for case let fileURL as URL in enumerator {
             let resourceValues = try fileURL.resourceValues(forKeys: [.isRegularFileKey])
-            if resourceValues.isRegularFile == true && fileURL.pathExtension == "swift" {
+            if resourceValues.isRegularFile == true, fileURL.pathExtension == "swift" {
                 swiftFiles.append(fileURL)
             }
         }
@@ -242,12 +247,12 @@ public enum ManifestCacheError: Error, LocalizedError {
 
     public var errorDescription: String? {
         switch self {
-        case .invalidPath(let path):
-            return "Invalid manifest path: \(path)"
-        case .hashComputationFailed(let reason):
-            return "Failed to compute source hash: \(reason)"
-        case .cacheCorrupted(let reason):
-            return "Cache is corrupted: \(reason)"
+        case let .invalidPath(path):
+            "Invalid manifest path: \(path)"
+        case let .hashComputationFailed(reason):
+            "Failed to compute source hash: \(reason)"
+        case let .cacheCorrupted(reason):
+            "Cache is corrupted: \(reason)"
         }
     }
 }

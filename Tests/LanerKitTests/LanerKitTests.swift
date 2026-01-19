@@ -1,5 +1,5 @@
-import Testing
 @testable import LanerKit
+import Testing
 
 @Suite("LanerKit Tests")
 struct LanerKitTests {

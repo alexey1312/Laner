@@ -12,12 +12,14 @@ The system SHALL provide a LaneBuilder result builder for declarative lane synta
 
 - **GIVEN** a LaneBuilder result builder is available
 - **WHEN** a developer writes:
+
 ```swift
 Lane("build") {
     GymAction(scheme: "App")
     ScanAction(scheme: "AppTests")
 }
 ```
+
 - **THEN** the lane contains two actions in order
 - **AND** both actions are wrapped as AnyAction
 
@@ -25,6 +27,7 @@ Lane("build") {
 
 - **GIVEN** a LaneBuilder with conditional support
 - **WHEN** a developer writes:
+
 ```swift
 Lane("deploy") {
     GymAction(scheme: "App")
@@ -33,6 +36,7 @@ Lane("deploy") {
     }
 }
 ```
+
 - **THEN** the conditional action is included when condition is true
 - **AND** the conditional action is omitted when condition is false
 

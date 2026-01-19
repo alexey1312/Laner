@@ -39,7 +39,7 @@ struct Lanerfile: LanerConfiguration {
                     "-scheme", "App",
                     "-configuration", configuration,
                     "-destination", "generic/platform=iOS Simulator",
-                    "build"
+                    "build",
                 ]
             )
 
@@ -66,7 +66,7 @@ struct Lanerfile: LanerConfiguration {
                     "-scheme", "App",
                     "-configuration", "Debug",
                     "-destination", "platform=iOS Simulator,name=iPhone 15",
-                    "test"
+                    "test",
                 ]
             )
 
@@ -101,7 +101,7 @@ struct Lanerfile: LanerConfiguration {
                     "-scheme", "App",
                     "-configuration", "Release",
                     "-archivePath", archivePath,
-                    "archive"
+                    "archive",
                 ]
             )
 
@@ -117,7 +117,7 @@ struct Lanerfile: LanerConfiguration {
                     name: "App Release Archive",
                     metadata: [
                         "configuration": "Release",
-                        "date": ISO8601DateFormatter().string(from: Date())
+                        "date": ISO8601DateFormatter().string(from: Date()),
                     ]
                 )
             )
@@ -154,12 +154,12 @@ enum LanerError: Error, LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .buildFailed(let reason):
-            return "Build failed: \(reason)"
-        case .testsFailed(let reason):
-            return "Tests failed: \(reason)"
-        case .archiveFailed(let reason):
-            return "Archive failed: \(reason)"
+        case let .buildFailed(reason):
+            "Build failed: \(reason)"
+        case let .testsFailed(reason):
+            "Tests failed: \(reason)"
+        case let .archiveFailed(reason):
+            "Archive failed: \(reason)"
         }
     }
 }

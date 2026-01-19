@@ -24,18 +24,18 @@ public enum ManifestError: Error, Sendable, Equatable {
 extension ManifestError: CustomStringConvertible {
     public var description: String {
         switch self {
-        case .notFound(let path):
-            return "Lanerfile.swift not found at: \(path.path)"
-        case .compilationFailed(let output):
-            return "Failed to compile manifest:\n\(output)"
-        case .executionFailed(let output):
-            return "Failed to execute manifest:\n\(output)"
-        case .invalidOutput(let details):
-            return "Invalid manifest output: \(details)"
+        case let .notFound(path):
+            "Lanerfile.swift not found at: \(path.path)"
+        case let .compilationFailed(output):
+            "Failed to compile manifest:\n\(output)"
+        case let .executionFailed(output):
+            "Failed to execute manifest:\n\(output)"
+        case let .invalidOutput(details):
+            "Invalid manifest output: \(details)"
         case .installPathNotFound:
-            return "Could not determine Laner installation path"
-        case .versionMismatch(let expected, let found):
-            return "DSL version mismatch: expected \(expected), found \(found)"
+            "Could not determine Laner installation path"
+        case let .versionMismatch(expected, found):
+            "DSL version mismatch: expected \(expected), found \(found)"
         }
     }
 }

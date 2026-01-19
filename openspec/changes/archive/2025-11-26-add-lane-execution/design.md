@@ -244,6 +244,7 @@ public func archive(
 ### 6. CLI Commands
 
 **InitCommand** — scaffolds Laner directory:
+
 ```swift
 struct InitCommand: AsyncParsableCommand {
     func run() async throws {
@@ -253,6 +254,7 @@ struct InitCommand: AsyncParsableCommand {
 ```
 
 **EditCommand** — opens manifest in Xcode with autocompletion:
+
 ```swift
 struct EditCommand: AsyncParsableCommand {
     func run() async throws {
@@ -263,6 +265,7 @@ struct EditCommand: AsyncParsableCommand {
 ```
 
 **LaneCommand:**
+
 ```swift
 struct LaneCommand: AsyncParsableCommand {
     @Argument var laneName: String
@@ -363,14 +366,14 @@ struct ManifestCache {
 
 ## Comparison with Alternatives
 
-| Aspect | JSON Config | Embedded Library | Swift Manifest (chosen) |
-|--------|-------------|------------------|-------------------------|
-| Type safety | Runtime | Compile-time | Compile-time |
-| IDE autocomplete | No | Yes | Yes |
-| User setup | Create JSON | Add SPM dependency | Run `laner init` |
-| Cold start | Fast | N/A | ~2-3s (compilation) |
-| Warm start | Fast | N/A | Fast (cached) |
-| Flexibility | Limited | Full Swift | Full Swift |
+| Aspect           | JSON Config | Embedded Library   | Swift Manifest (chosen) |
+| ---------------- | ----------- | ------------------ | ----------------------- |
+| Type safety      | Runtime     | Compile-time       | Compile-time            |
+| IDE autocomplete | No          | Yes                | Yes                     |
+| User setup       | Create JSON | Add SPM dependency | Run `laner init`        |
+| Cold start       | Fast        | N/A                | ~2-3s (compilation)     |
+| Warm start       | Fast        | N/A                | Fast (cached)           |
+| Flexibility      | Limited     | Full Swift         | Full Swift              |
 
 **Decision:** Swift manifest compilation provides best DX with acceptable cold-start overhead. Caching makes subsequent runs fast.
 

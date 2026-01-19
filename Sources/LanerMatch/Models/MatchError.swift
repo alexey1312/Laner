@@ -45,69 +45,64 @@ public enum MatchError: Error, LocalizedError, Sendable, Equatable {
 
     public var errorDescription: String? {
         switch self {
-        case .encryptionFailed(let reason):
-            return "Encryption failed: \(reason)"
-        case .decryptionFailed(let reason):
-            return "Decryption failed: \(reason)"
+        case let .encryptionFailed(reason):
+            "Encryption failed: \(reason)"
+        case let .decryptionFailed(reason):
+            "Decryption failed: \(reason)"
         case .invalidPassword:
-            return "Invalid password - decryption failed"
+            "Invalid password - decryption failed"
         case .keyDerivationFailed:
-            return "Failed to derive encryption key from password"
-
-        case .gitCloneFailed(let reason):
-            return "Failed to clone Git repository: \(reason)"
-        case .gitPushFailed(let reason):
-            return "Failed to push to Git repository: \(reason)"
+            "Failed to derive encryption key from password"
+        case let .gitCloneFailed(reason):
+            "Failed to clone Git repository: \(reason)"
+        case let .gitPushFailed(reason):
+            "Failed to push to Git repository: \(reason)"
         case .gitAuthenticationFailed:
-            return "Git authentication failed"
+            "Git authentication failed"
         case .storageNotConfigured:
-            return "Storage not configured - set MATCH_GIT_URL or provide gitUrl"
-        case .fileNotFound(let path):
-            return "File not found: \(path)"
-
+            "Storage not configured - set MATCH_GIT_URL or provide gitUrl"
+        case let .fileNotFound(path):
+            "File not found: \(path)"
         case .keychainAccessDenied:
-            return "Keychain access denied"
-        case .keychainImportFailed(let reason):
-            return "Failed to import to Keychain: \(reason)"
+            "Keychain access denied"
+        case let .keychainImportFailed(reason):
+            "Failed to import to Keychain: \(reason)"
         case .keychainNotAvailable:
-            return "Keychain operations require macOS"
-        case .certificateInstallationFailed(let reason):
-            return "Certificate installation failed: \(reason)"
-        case .profileInstallationFailed(let reason):
-            return "Profile installation failed: \(reason)"
-
+            "Keychain operations require macOS"
+        case let .certificateInstallationFailed(reason):
+            "Certificate installation failed: \(reason)"
+        case let .profileInstallationFailed(reason):
+            "Profile installation failed: \(reason)"
         case .apiAuthenticationFailed:
-            return "App Store Connect API authentication failed"
-        case .apiRequestFailed(let reason):
-            return "App Store Connect API request failed: \(reason)"
-        case .certificateCreationFailed(let reason):
-            return "Failed to create certificate: \(reason)"
-        case .certificateRevocationFailed(let reason):
-            return "Failed to revoke certificate: \(reason)"
-        case .profileCreationFailed(let reason):
-            return "Failed to create provisioning profile: \(reason)"
-        case .profileDeletionFailed(let reason):
-            return "Failed to delete provisioning profile: \(reason)"
-        case .deviceRegistrationFailed(let reason):
-            return "Failed to register device: \(reason)"
-
-        case .missingConfiguration(let key):
-            return "Missing configuration: \(key)"
-        case .invalidConfiguration(let reason):
-            return "Invalid configuration: \(reason)"
-        case .missingEnvironmentVariable(let name):
-            return "Required environment variable not set: \(name)"
-
-        case .noCertificatesFound(let type):
-            return "No \(type.rawValue) certificates found in storage"
-        case .noProfilesFound(let type, let bundleId):
-            return "No \(type.rawValue) profiles found for \(bundleId)"
+            "App Store Connect API authentication failed"
+        case let .apiRequestFailed(reason):
+            "App Store Connect API request failed: \(reason)"
+        case let .certificateCreationFailed(reason):
+            "Failed to create certificate: \(reason)"
+        case let .certificateRevocationFailed(reason):
+            "Failed to revoke certificate: \(reason)"
+        case let .profileCreationFailed(reason):
+            "Failed to create provisioning profile: \(reason)"
+        case let .profileDeletionFailed(reason):
+            "Failed to delete provisioning profile: \(reason)"
+        case let .deviceRegistrationFailed(reason):
+            "Failed to register device: \(reason)"
+        case let .missingConfiguration(key):
+            "Missing configuration: \(key)"
+        case let .invalidConfiguration(reason):
+            "Invalid configuration: \(reason)"
+        case let .missingEnvironmentVariable(name):
+            "Required environment variable not set: \(name)"
+        case let .noCertificatesFound(type):
+            "No \(type.rawValue) certificates found in storage"
+        case let .noProfilesFound(type, bundleId):
+            "No \(type.rawValue) profiles found for \(bundleId)"
         case .readonlyModeViolation:
-            return "Cannot create certificates/profiles in readonly mode"
+            "Cannot create certificates/profiles in readonly mode"
         case .operationCancelled:
-            return "Operation cancelled by user"
-        case .platformNotSupported(let operation):
-            return "\(operation) is not supported on this platform"
+            "Operation cancelled by user"
+        case let .platformNotSupported(operation):
+            "\(operation) is not supported on this platform"
         }
     }
 }

@@ -282,6 +282,7 @@ Lane 'build' completed in 45.2s
 ### Task 16: Add integration tests
 
 **Files:**
+
 - `Tests/LanerCoreTests/ManifestIntegrationTests.swift`
 - `Tests/Fixtures/Laner/Lanerfile.swift`
 

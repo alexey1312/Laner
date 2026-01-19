@@ -5,18 +5,18 @@ public enum Platform {
     /// Whether the current platform is macOS.
     public static var isMacOS: Bool {
         #if os(macOS)
-        return true
+            return true
         #else
-        return false
+            return false
         #endif
     }
 
     /// Whether the current platform is Linux.
     public static var isLinux: Bool {
         #if os(Linux)
-        return true
+            return true
         #else
-        return false
+            return false
         #endif
     }
 
@@ -37,7 +37,8 @@ public enum Platform {
 
         for envVar in ciEnvironmentVariables {
             if let value = ProcessInfo.processInfo.environment[envVar],
-               !value.isEmpty {
+               !value.isEmpty
+            {
                 return true
             }
         }
@@ -81,14 +82,14 @@ public enum Platform {
 
     /// The current macOS version, if running on macOS.
     #if os(macOS)
-    public static var macOSVersion: OperatingSystemVersion {
-        ProcessInfo.processInfo.operatingSystemVersion
-    }
+        public static var macOSVersion: OperatingSystemVersion {
+            ProcessInfo.processInfo.operatingSystemVersion
+        }
 
-    /// A string representation of the macOS version.
-    public static var macOSVersionString: String {
-        let version = macOSVersion
-        return "\(version.majorVersion).\(version.minorVersion).\(version.patchVersion)"
-    }
+        /// A string representation of the macOS version.
+        public static var macOSVersionString: String {
+            let version = macOSVersion
+            return "\(version.majorVersion).\(version.minorVersion).\(version.patchVersion)"
+        }
     #endif
 }

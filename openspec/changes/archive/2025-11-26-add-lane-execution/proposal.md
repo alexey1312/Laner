@@ -29,6 +29,7 @@ missing[6]{component,impact}:
 ## Problem Statement
 
 Users cannot currently:
+
 1. Run custom lanes defined in Swift
 2. Get IDE autocompletion when writing lane definitions
 3. Reuse code across lane definitions (helpers)
@@ -57,6 +58,7 @@ let laner = Lanerfile(
 ```
 
 **Key benefits:**
+
 - Full type-safety (compile-time validation)
 - IDE autocomplete via LanerDSL module
 - Reusable helpers (`LanerHelpers/`)

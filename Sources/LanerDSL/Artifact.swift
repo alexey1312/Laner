@@ -66,7 +66,7 @@ public struct Artifact: Sendable, Equatable {
         self.path = path
         self.name = name ?? path.lastPathComponent
         self.metadata = metadata
-        self.createdAt = Date()
+        createdAt = Date()
     }
 
     /// Whether the artifact file exists (file or directory).

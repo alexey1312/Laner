@@ -51,7 +51,8 @@ public actor ManifestCompiler {
         // Check that the manifest exists
         var isDirectory: ObjCBool = false
         guard fileManager.fileExists(atPath: path.path, isDirectory: &isDirectory),
-              !isDirectory.boolValue else {
+              !isDirectory.boolValue
+        else {
             throw ManifestError.notFound(path: path)
         }
 
@@ -240,7 +241,8 @@ public actor ManifestCompiler {
         let versionFile = installDir.appendingPathComponent("VERSION")
 
         guard let bundledVersion = try? String(contentsOf: versionFile, encoding: .utf8)
-            .trimmingCharacters(in: .whitespacesAndNewlines) else {
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        else {
             // No VERSION file found - skip validation for backwards compatibility
             return
         }

@@ -1,6 +1,6 @@
 import Foundation
-import Testing
 @testable import LanerDSL
+import Testing
 
 @Suite("Lanerfile Tests")
 struct LanerfileTests {
@@ -61,7 +61,7 @@ struct LanerfileTests {
         let lanes = [
             Lane(name: "build", description: "Build") { _ in },
             Lane(name: "test", description: "Test") { _ in },
-            Lane(name: "deploy", description: "Deploy") { _ in }
+            Lane(name: "deploy", description: "Deploy") { _ in },
         ]
 
         let manifest = Lanerfile(lanes: lanes)
@@ -77,7 +77,7 @@ struct LanerfileTests {
     func lanerfileSerialization() async throws {
         let lanes = [
             Lane(name: "build", description: "Build the app") { _ in },
-            Lane(name: "test", description: "Run tests") { _ in }
+            Lane(name: "test", description: "Run tests") { _ in },
         ]
 
         let manifest = Lanerfile(lanes: lanes)

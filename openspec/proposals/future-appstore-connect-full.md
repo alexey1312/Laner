@@ -166,6 +166,7 @@ priority[4]{phase,priority,rationale}:
 ## Documentation Source
 
 Apple App Store Connect API documentation available via Sosumi.ai proxy:
+
 ```
 https://sosumi.ai/documentation/appstoreconnectapi
 ```

@@ -29,9 +29,9 @@ public struct AnyAction: Sendable {
     /// Creates a type-erased action from any concrete action.
     /// - Parameter action: The action to wrap.
     public init<A: Action>(_ action: A) {
-        self.name = A.name
-        self.description = A.description
-        self._execute = { context in
+        name = A.name
+        description = A.description
+        _execute = { context in
             _ = try await action.execute(context: context)
         }
     }
@@ -61,9 +61,9 @@ public struct AnyTypedAction<Result: Sendable>: Sendable {
     /// Creates a type-erased action from any concrete action with a matching result type.
     /// - Parameter action: The action to wrap.
     public init<A: Action>(_ action: A) where A.Result == Result {
-        self.name = A.name
-        self.description = A.description
-        self._execute = { context in
+        name = A.name
+        description = A.description
+        _execute = { context in
             try await action.execute(context: context)
         }
     }

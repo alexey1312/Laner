@@ -61,33 +61,33 @@ public protocol LanerConfiguration {
 
 // MARK: - Default Implementations
 
-extension LanerConfiguration {
-    public static func beforeAll(lane: Lane) async {
+public extension LanerConfiguration {
+    static func beforeAll(lane: Lane) async {
         // Default: no-op
     }
 
-    public static func afterAll(lane: Lane, result: LaneResult) async {
+    static func afterAll(lane: Lane, result: LaneResult) async {
         // Default: no-op
     }
 
-    public static func onError(lane: Lane, error: any Error) async {
+    static func onError(lane: Lane, error: any Error) async {
         // Default: no-op
     }
 }
 
 // MARK: - Configuration Helpers
 
-extension LanerConfiguration {
+public extension LanerConfiguration {
     /// Finds a lane by name.
     /// - Parameter name: The lane name to find.
     /// - Returns: The lane if found, or nil.
-    public static func lane(named name: String) -> Lane? {
+    static func lane(named name: String) -> Lane? {
         lanes.first { $0.name == name }
     }
 
     /// Validates that all lane names are unique.
     /// - Throws: `ConfigurationError.duplicateLaneName` if duplicates exist.
-    public static func validate() throws {
+    static func validate() throws {
         var seen = Set<String>()
         for lane in lanes {
             if seen.contains(lane.name) {
@@ -104,7 +104,7 @@ extension LanerConfiguration {
     /// - Returns: The result of lane execution.
     /// - Throws: `ConfigurationError.laneNotFound` if no lane matches.
     @MainActor
-    public static func runLane(
+    static func runLane(
         named name: String,
         context: ExecutionContext? = nil
     ) async throws -> LaneResult {
@@ -169,12 +169,12 @@ public enum ConfigurationError: Error, LocalizedError {
 
     public var errorDescription: String? {
         switch self {
-        case .laneNotFound(let name):
-            return "Lane '\(name)' not found. Run 'laner lanes' to see available lanes."
-        case .duplicateLaneName(let name):
-            return "Duplicate lane name '\(name)'. Lane names must be unique."
-        case .loadFailed(let reason):
-            return "Failed to load Lanerfile: \(reason)"
+        case let .laneNotFound(name):
+            "Lane '\(name)' not found. Run 'laner lanes' to see available lanes."
+        case let .duplicateLaneName(name):
+            "Duplicate lane name '\(name)'. Lane names must be unique."
+        case let .loadFailed(reason):
+            "Failed to load Lanerfile: \(reason)"
         }
     }
 }

@@ -1,6 +1,6 @@
-import Testing
 import Foundation
 @testable import LanerKit
+import Testing
 
 @Suite("ShellExecutor Tests")
 struct ShellExecutorTests {
@@ -58,7 +58,7 @@ struct ShellExecutorTests {
             _ = try await executor.runOrThrow("sh", arguments: ["-c", "exit 1"])
             Issue.record("Expected ShellError.executionFailed to be thrown")
         } catch let error as ShellError {
-            if case .executionFailed(_, let exitCode, _) = error {
+            if case let .executionFailed(_, exitCode, _) = error {
                 #expect(exitCode == 1)
             } else {
                 Issue.record("Expected ShellError.executionFailed but got \(error)")
@@ -72,7 +72,7 @@ struct ShellExecutorTests {
             _ = try await executor.run("definitely_not_a_real_command_12345")
             Issue.record("Expected ShellError.commandNotFound to be thrown")
         } catch let error as ShellError {
-            if case .commandNotFound(_) = error {
+            if case .commandNotFound = error {
                 // Expected
             } else {
                 Issue.record("Expected ShellError.commandNotFound but got \(error)")

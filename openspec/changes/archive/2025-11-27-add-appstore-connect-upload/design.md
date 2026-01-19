@@ -76,6 +76,7 @@ struct UploadProgress: Sendable {
 ```
 
 **Why Build Upload API v4.1+:**
+
 - Modern REST API, no external tools required
 - Chunked uploads for large files
 - Direct S3 upload for performance
@@ -192,11 +193,13 @@ laner upload testflight --ipa App.ipa --groups "QA,Internal" --changelog "Bug fi
 ## Configuration
 
 Reuses existing Match environment variables:
+
 - APP_STORE_CONNECT_API_KEY_ID
 - APP_STORE_CONNECT_API_ISSUER_ID
 - APP_STORE_CONNECT_API_KEY_PATH
 
 Plus optional:
+
 - APP_STORE_APP_ID (for build queries)
 
 ## Error Handling

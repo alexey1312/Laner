@@ -135,7 +135,9 @@ public struct MatchAction: Action {
         let appIdentifiers = options.appIdentifier.map { [$0] } ?? []
         let result = try await service.sync(type: options.type, appIdentifiers: appIdentifiers)
 
-        context.logger.info("[\(Self.name)] Sync complete: \(result.certificates.count) certificates, \(result.profiles.count) profiles")
+        let certs = result.certificates.count
+        let profiles = result.profiles.count
+        context.logger.info("[\(Self.name)] Sync complete: \(certs) certificates, \(profiles) profiles")
 
         return result
     }
@@ -195,11 +197,11 @@ public enum MatchActionError: Error, LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .missingPassword:
-            return "Match password must be provided via options or MATCH_PASSWORD environment variable"
+            "Match password must be provided via options or MATCH_PASSWORD environment variable"
         case .missingGitUrl:
-            return "Git URL must be provided via options or MATCH_GIT_URL environment variable"
+            "Git URL must be provided via options or MATCH_GIT_URL environment variable"
         case .missingTeamId:
-            return "Team ID must be provided via options or MATCH_TEAM_ID environment variable"
+            "Team ID must be provided via options or MATCH_TEAM_ID environment variable"
         }
     }
 }

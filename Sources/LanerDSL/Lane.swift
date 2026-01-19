@@ -1,6 +1,6 @@
 import Foundation
-import Logging
 import LanerKit
+import Logging
 
 /// Represents a CI/CD lane containing a sequence of actions.
 ///
@@ -54,7 +54,7 @@ public struct Lane: Sendable {
     ) {
         self.name = name
         self.description = description
-        self.body = { context in
+        body = { context in
             for action in actions {
                 try await action.execute(context: context)
             }
@@ -82,7 +82,7 @@ public struct Lane: Sendable {
         self.name = name
         self.description = description
         let actionArray = actions()
-        self.body = { context in
+        body = { context in
             for action in actionArray {
                 try await action.execute(context: context)
             }

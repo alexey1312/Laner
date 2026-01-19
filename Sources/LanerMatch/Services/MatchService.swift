@@ -134,22 +134,23 @@ public actor MatchService {
 
     public init(configuration: MatchConfiguration) throws {
         self.configuration = configuration
-        self.storage = GitStorage(gitUrl: configuration.gitUrl, branch: configuration.branch)
-        self.crypto = CryptoService()
-        self.keychain = KeychainService()
-        self.logger = Logger(label: "laner.match")
+        storage = GitStorage(gitUrl: configuration.gitUrl, branch: configuration.branch)
+        crypto = CryptoService()
+        keychain = KeychainService()
+        logger = Logger(label: "laner.match")
 
         // Initialize API client if credentials provided
         if let keyId = configuration.apiKeyId,
            let issuerId = configuration.apiIssuerId,
-           let keyPath = configuration.apiKeyPath {
-            self.api = try AppStoreConnectAPI(
+           let keyPath = configuration.apiKeyPath
+        {
+            api = try AppStoreConnectAPI(
                 keyId: keyId,
                 issuerId: issuerId,
                 privateKeyPath: keyPath
             )
         } else {
-            self.api = nil
+            api = nil
         }
     }
 
@@ -203,8 +204,11 @@ public actor MatchService {
         }
 
         // Find all .p12 files
-        let p12Files = try Foundation.FileManager.default.contentsOfDirectory(at: certPath, includingPropertiesForKeys: nil)
-            .filter { $0.pathExtension == "p12" }
+        let p12Files = try Foundation.FileManager.default.contentsOfDirectory(
+            at: certPath,
+            includingPropertiesForKeys: nil
+        )
+        .filter { $0.pathExtension == "p12" }
 
         if p12Files.isEmpty {
             if configuration.readonly {
@@ -221,7 +225,11 @@ public actor MatchService {
 
             // Install to keychain (discarding non-Sendable SecIdentity result)
             #if os(macOS)
-            try await keychain.importCertificateDiscardingIdentity(p12Data: decryptedData, password: configuration.password, keychain: nil)
+                try await keychain.importCertificateDiscardingIdentity(
+                    p12Data: decryptedData,
+                    password: configuration.password,
+                    keychain: nil
+                )
             #endif
 
             // Create certificate model (simplified - actual impl would parse the p12)
@@ -240,7 +248,11 @@ public actor MatchService {
         return installedCerts
     }
 
-    private func syncProfiles(type: CertificateType, appIdentifier: String? = nil, repoPath: URL) async throws -> [ProvisioningProfile] {
+    private func syncProfiles(
+        type: CertificateType,
+        appIdentifier: String? = nil,
+        repoPath: URL
+    ) async throws -> [ProvisioningProfile] {
         let profilePath = repoPath.appendingPathComponent(type.profilePath)
 
         guard Foundation.FileManager.default.directoryExists(atPath: profilePath.path) else {
@@ -251,12 +263,18 @@ public actor MatchService {
         }
 
         // Find all .mobileprovision files
-        var profileFiles = try Foundation.FileManager.default.contentsOfDirectory(at: profilePath, includingPropertiesForKeys: nil)
-            .filter { $0.pathExtension == "mobileprovision" }
+        var profileFiles = try Foundation.FileManager.default.contentsOfDirectory(
+            at: profilePath,
+            includingPropertiesForKeys: nil
+        )
+        .filter { $0.pathExtension == "mobileprovision" }
 
         // Filter by app identifier if specified
         if let appId = appIdentifier {
-            profileFiles = profileFiles.filter { $0.lastPathComponent.contains(appId.replacingOccurrences(of: ".", with: "_")) }
+            profileFiles = profileFiles.filter { $0.lastPathComponent.contains(appId.replacingOccurrences(
+                of: ".",
+                with: "_"
+            )) }
         }
 
         var installedProfiles: [ProvisioningProfile] = []
@@ -290,7 +308,7 @@ public actor MatchService {
     }
 
     private func createAndStoreCertificate(type: CertificateType, repoPath: URL) async throws -> [Certificate] {
-        guard let api = api else {
+        guard let api else {
             throw MatchError.missingConfiguration("App Store Connect API credentials required to create certificates")
         }
 
@@ -321,7 +339,7 @@ public actor MatchService {
 
     /// Revoke and remove all certificates of a type
     public func nuke(type: CertificateType) async throws -> NukeResult {
-        guard let api = api else {
+        guard let api else {
             throw MatchError.missingConfiguration("App Store Connect API credentials required for nuke operation")
         }
 
@@ -376,7 +394,10 @@ public actor MatchService {
     // MARK: - Register Devices
 
     /// Register devices from a file
-    public func registerDevices(fromFile path: String, platform: Device.Platform = .iOS) async throws -> RegisterDevicesResult {
+    public func registerDevices(
+        fromFile path: String,
+        platform: Device.Platform = .iOS
+    ) async throws -> RegisterDevicesResult {
         let fileURL = URL(fileURLWithPath: path)
         let content = try String(contentsOf: fileURL, encoding: .utf8)
 
@@ -402,8 +423,11 @@ public actor MatchService {
     }
 
     /// Register devices from a dictionary
-    public func registerDevices(_ devices: [(name: String, udid: String)], platform: Device.Platform = .iOS) async throws -> RegisterDevicesResult {
-        guard let api = api else {
+    public func registerDevices(
+        _ devices: [(name: String, udid: String)],
+        platform: Device.Platform = .iOS
+    ) async throws -> RegisterDevicesResult {
+        guard let api else {
             throw MatchError.missingConfiguration("App Store Connect API credentials required to register devices")
         }
 
@@ -418,7 +442,9 @@ public actor MatchService {
 
         for device in devices {
             if existingUDIDs.contains(device.udid.lowercased()) {
-                if let existingDevice = existingDevices.first(where: { $0.udid.lowercased() == device.udid.lowercased() }) {
+                if let existingDevice = existingDevices
+                    .first(where: { $0.udid.lowercased() == device.udid.lowercased() })
+                {
                     existing.append(existingDevice)
                 }
                 logger.info("Device already registered: \(device.name)")
