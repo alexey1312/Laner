@@ -7,8 +7,26 @@ on:
     branches: [main]
 
 jobs:
+  lint:
+    name: Lint
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup mise
+        uses: jdx/mise-action@v3
+        with:
+          experimental: true
+
+      - name: Check formatting
+        run: mise run format-check
+
+      - name: Lint
+        run: mise run lint
+
   build-macos:
     name: Build & Test (macOS)
+    needs: lint
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v5
@@ -19,16 +37,17 @@ jobs:
       - name: Setup mise
         uses: jdx/mise-action@v3
         with:
-          cache: true
+          experimental: true
 
       - name: Build
-        run: swift build 2>&1 | xcbeautify
+        run: swift build 2>&1 | xcsift -f toon --toon-key-folding safe
 
       - name: Run tests
-        run: swift test 2>&1 | xcbeautify
+        run: swift test 2>&1 | xcsift -f toon --toon-key-folding safe
 
   build-linux:
     name: Build (Linux)
+    needs: lint
     runs-on: ubuntu-latest
     container:
       image: swift:6.0
@@ -44,10 +63,10 @@ jobs:
       - name: Setup mise
         uses: jdx/mise-action@v3
         with:
-          cache: true
+          experimental: true
 
       - name: Build
-        run: swift build 2>&1 | xcbeautify
+        run: swift build 2>&1 | xcsift -f toon --toon-key-folding safe
 
       - name: Run tests
-        run: swift test 2>&1 | xcbeautify
+        run: swift test 2>&1 | xcsift -f toon --toon-key-folding safe

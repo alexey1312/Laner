@@ -1,2 +1,68 @@
+[settings]
+lockfile = true
+experimental = true
+legacy_version_file = false
+
+[hooks.enter]
+run = "git config core.hooksPath .githooks 2>/dev/null || true"
+
 [tools]
-xcbeautify = "latest"
+swiftformat = "0.58.7"
+swiftlint = "0.63.0"
+xcsift = "1.0.19"
+dprint = "0.50.2"
+hk = "1.28.0"
+actionlint = "1.7.9"
+git-cliff = "2.10.1"
+pkl = "0.30.2"
+
+[tasks.build]
+description = "Build (debug)"
+run = "swift build 2>&1 | xcsift -w -f toon --toon-key-folding safe"
+
+[tasks."build:release"]
+description = "Build (release)"
+run = "swift build --configuration release 2>&1 | xcsift -w -f toon --toon-key-folding safe"
+
+[tasks.test]
+description = "Run tests"
+run = "swift test 2>&1 | xcsift -w -f toon --toon-key-folding safe"
+
+[tasks.lint]
+description = "SwiftLint + actionlint"
+run = """
+swiftlint lint --strict Sources Tests 2>&1 | xcsift -f toon --toon-key-folding safe
+actionlint
+"""
+
+[tasks."format:swift"]
+description = "Format Swift"
+run = "swiftformat Sources Tests"
+
+[tasks."format:md"]
+description = "Format Markdown"
+run = "dprint fmt"
+
+[tasks.format]
+description = "Format all"
+run = "hk fix --all 2>&1 | grep -E '^(✔|✗|hk )' || true"
+
+[tasks.format-check]
+description = "Check formatting (CI)"
+run = "hk check --all 2>&1 | grep -E '^(✔|✗|hk )'"
+
+[tasks.pre-commit]
+description = "Pre-commit checks"
+run = "hk check --all 2>&1 | grep -E '^(✔|✗|hk )'"
+
+[tasks.clean]
+description = "Clean build"
+run = "swift package clean && rm -rf .build"
+
+[tasks.changelog]
+description = "Generate CHANGELOG.md"
+run = "git-cliff -o CHANGELOG.md"
+
+[tasks."changelog:unreleased"]
+description = "Preview unreleased"
+run = "git-cliff --unreleased"
