@@ -9,11 +9,11 @@ run = "git config core.hooksPath .githooks 2>/dev/null || true"
 [tools]
 swiftformat = "0.58.7"
 swiftlint = "0.63.1"
-xcsift = "1.0.19"
-dprint = "0.50.2"
-hk = "1.28.0"
-actionlint = "1.7.9"
-git-cliff = "2.10.1"
+xcsift = "1.0.23"
+dprint = "0.51.1"
+hk = "1.32.0"
+actionlint = "1.7.10"
+git-cliff = "2.11.0"
 pkl = "0.30.2"
 
 [tasks.build]

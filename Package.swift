@@ -22,10 +22,10 @@ let package = Package(
         .library(name: "LanerMatch", targets: ["LanerMatch"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.3.0"),
-        .package(url: "https://github.com/apple/swift-log", from: "1.5.0"),
-        .package(url: "https://github.com/apple/swift-crypto", from: "3.0.0"),
-        .package(url: "https://github.com/swift-server/async-http-client", from: "1.20.0"),
+        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.7.0"),
+        .package(url: "https://github.com/apple/swift-log", from: "1.9.1"),
+        .package(url: "https://github.com/apple/swift-crypto", from: "3.15.1"),
+        .package(url: "https://github.com/swift-server/async-http-client", from: "1.30.3"),
     ],
     targets: [
         // Executable

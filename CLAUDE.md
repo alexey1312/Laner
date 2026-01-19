@@ -157,10 +157,14 @@ All public types conform to `Sendable`.
 
 ## Build & Test
 
+Always use mise tasks (output is parsed by xcsift for token efficiency):
+
 ```bash
-swift build
-swift test
-swift test --enable-code-coverage
+mise run build          # Debug build
+mise run build:release  # Release build
+mise run test           # Run tests
+mise run lint           # SwiftLint + actionlint
+mise run format         # Format all (Swift + Markdown)
 ```
 
 ## CLI Commands
