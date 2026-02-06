@@ -6,17 +6,22 @@ on:
   pull_request:
     branches: [main]
 
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  MISE_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  MISE_GITHUB_GITHUB_ATTESTATIONS: false
+
 jobs:
   lint:
     name: Lint
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
-      - name: Setup mise
-        uses: jdx/mise-action@v3
+      - uses: jdx/mise-action@v3
         with:
           experimental: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check formatting
         run: mise run format-check
@@ -29,44 +34,67 @@ jobs:
     needs: lint
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
+
+      - name: Cache SPM dependencies
+        uses: actions/cache@v4
+        with:
+          path: .build
+          key: ${{ runner.os }}-spm-${{ hashFiles('Package.swift', 'Package.resolved') }}
+          restore-keys: |
+            ${{ runner.os }}-spm-
+
+      - uses: jdx/mise-action@v3
+        with:
+          experimental: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Show Swift version
         run: swift --version
 
-      - name: Setup mise
-        uses: jdx/mise-action@v3
-        with:
-          experimental: true
-
       - name: Build
-        run: swift build 2>&1 | xcsift -f toon --toon-key-folding safe
+        run: swift build 2>&1 | xcsift
 
       - name: Run tests
-        run: swift test 2>&1 | xcsift -f toon --toon-key-folding safe
+        run: swift test 2>&1 | xcsift
 
   build-linux:
-    name: Build (Linux)
+    name: Build & Test (Linux)
     needs: lint
     runs-on: ubuntu-latest
     container:
       image: swift:6.0
     steps:
       - name: Install dependencies
-        run: apt-get update && apt-get install -y curl
+        run: |
+          apt-get update
+          apt-get install -y curl
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
+
+      - name: Cache SPM dependencies
+        uses: actions/cache@v4
+        with:
+          path: .build
+          key: ${{ runner.os }}-spm-${{ hashFiles('Package.swift', 'Package.resolved') }}
+          restore-keys: |
+            ${{ runner.os }}-spm-
+
+      - uses: jdx/mise-action@v3
+        with:
+          experimental: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Add xcsift to PATH
+        run: |
+          mise install xcsift
+          mise where xcsift >> "$GITHUB_PATH"
 
       - name: Show Swift version
         run: swift --version
 
-      - name: Setup mise
-        uses: jdx/mise-action@v3
-        with:
-          experimental: true
-
       - name: Build
-        run: swift build 2>&1 | xcsift -f toon --toon-key-folding safe
+        run: swift build 2>&1 | xcsift
 
       - name: Run tests
-        run: swift test 2>&1 | xcsift -f toon --toon-key-folding safe
+        run: swift test 2>&1 | xcsift
