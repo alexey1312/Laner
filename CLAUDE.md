@@ -20,6 +20,10 @@ Keep this managed block so 'openspec update' can refresh the instructions.
 
 <!-- OPENSPEC:END -->
 
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 # Laner
 
 Swift-based CI/CD pipeline automation framework.
@@ -108,12 +112,31 @@ When adding lists of items (modules, commands, files, etc.), always use TOON tab
 ```
 laner (CLI executable)
     ↓
-LanerCore (Commands & Orchestration) - internal
+LanerCore (Commands & Orchestration) - internal, not a library product
     ↓
-LanerDSL (Public DSL API) + LanerKit (Shared Utilities)
+LanerDSL (Public DSL API) ──→ LanerMatch (Code Signing)
+    ↓                              ↓
+LanerKit (Shared Utilities) ◄──────┘
     ↓
 LanerPluginKit (Plugin Development)
 ```
+
+### API Surface & Re-exports
+
+`LanerDSL` uses `@_exported import` to re-export `LanerKit` and `LanerMatch`. Users only need `import LanerDSL` to access the full public API. `LanerCore` is internal — it's only consumed by the `laner` executable, never exposed as a library product.
+
+### Manifest Compilation Flow
+
+User manifests (`Laner/Lanerfile.swift`) are **compiled into a separate executable**, not evaluated at runtime:
+
+1. `ManifestLoader` discovers `Laner/Lanerfile.swift` (+ optional `LanerHelpers/`)
+2. `ManifestCache` checks SHA256 hash — skips recompilation if unchanged
+3. `ManifestCompiler` creates a temporary Swift package with a local path dependency to LanerDSL
+4. The temp package builds with `swift build -c release`
+5. The compiled binary runs and outputs the manifest as **JSON to stdout**
+6. JSON is decoded into a `Lanerfile` struct
+
+This enables full Swift language features in configuration while keeping execution safe and cacheable.
 
 ### Key Source Files
 
@@ -165,7 +188,22 @@ mise run build:release  # Release build
 mise run test           # Run tests
 mise run lint           # SwiftLint + actionlint
 mise run format         # Format all (Swift + Markdown)
+mise run clean          # Clean build artifacts
 ```
+
+### Running a Single Test
+
+```bash
+# Single test suite
+swift test --filter LanerKitTests 2>&1 | xcsift -w -f toon --toon-key-folding safe
+
+# Single test by name
+swift test --filter LanerKitTests.ShellExecutorTests/runEchoCommand 2>&1 | xcsift -w -f toon --toon-key-folding safe
+```
+
+### Strict Mode
+
+`LANER_STRICT=1 swift build` enables `-warnings-as-errors` for all targets except LanerMatch (excluded due to unavoidable SecKeychain deprecation warnings).
 
 ## CLI Commands
 
@@ -227,7 +265,15 @@ test_suites[4]{directory,coverage}:
   LanerMatchTests/,Crypto, API, Keychain tests
 ```
 
-Uses Swift Testing framework (`@Suite`, `@Test` macros).
+Uses Swift Testing framework (`@Suite`, `@Test` macros). Tests are self-contained — no shared test utilities module; each test target uses `@testable import` directly.
+
+## Git Hooks
+
+Pre-commit and commit-msg hooks are configured in `.githooks/` and activated via `mise` (auto-set on directory enter). They run `hk` checks (formatting, linting, conventional commits). Set `HK=0` to bypass.
+
+## Examples
+
+`Examples/` contains reference manifests: `BasicLanerfile.swift`, `DSLActionsExample.swift`, `MatchConfig.swift`, etc. Use these as templates when implementing new DSL features.
 
 ## External Documentation
 
