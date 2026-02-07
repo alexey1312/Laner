@@ -1,0 +1,160 @@
+// MatchConfig.pkl
+// Example demonstrating Match code signing configurations.
+//
+// Required environment variables:
+// - MATCH_PASSWORD: Encryption password for certificates
+// - MATCH_GIT_URL: Git repository URL for certificates
+// - MATCH_TEAM_ID: Apple Developer Team ID
+//
+// Optional:
+// - APP_STORE_CONNECT_API_KEY_ID
+// - APP_STORE_CONNECT_API_ISSUER_ID
+// - APP_STORE_CONNECT_API_KEY_PATH
+
+amends "pkl/Lanerfile.pkl"
+
+local isCI = read?("env:CI") == "true"
+
+lanes {
+  // Sync development certificates
+  new {
+    name = "dev_certificates"
+    description = "Sync development certificates"
+    actions {
+      new MatchAction {
+        certificateType = "development"
+        appIdentifier = "com.example.app"
+      }
+      new GymAction {
+        scheme = "MyApp"
+        configuration = "debug"
+      }
+    }
+  }
+
+  // App Store distribution with readonly mode
+  new {
+    name = "appstore"
+    description = "Sync App Store certificates and build"
+    actions {
+      new MatchAction {
+        certificateType = "appstore"
+        appIdentifier = "com.example.app"
+        readonly = true
+      }
+      new GymAction {
+        scheme = "MyApp"
+        configuration = "release"
+      }
+      new ArchiveAction {
+        scheme = "MyApp"
+        exportMethod = "app-store"
+      }
+    }
+  }
+
+  // Ad-hoc with device registration
+  new {
+    name = "adhoc_with_devices"
+    description = "Register devices and build ad-hoc"
+    actions {
+      new RegisterDevicesAction {
+        file = "devices.txt"
+      }
+      new MatchAction {
+        certificateType = "adhoc"
+        appIdentifier = "com.example.app"
+        forceForNewDevices = true
+      }
+      new GymAction {
+        scheme = "MyApp"
+        configuration = "release"
+      }
+      new ArchiveAction {
+        scheme = "MyApp"
+        exportMethod = "ad-hoc"
+      }
+    }
+  }
+
+  // Custom Git repository and branch
+  new {
+    name = "custom_git"
+    description = "Sync using custom Git configuration"
+    actions {
+      new MatchAction {
+        certificateType = "development"
+        appIdentifier = "com.example.app"
+        teamId = "ABC123DEF4"
+        gitUrl = "https://github.com/mycompany/ios-certificates.git"
+        branch = "develop"
+      }
+    }
+  }
+
+  // Multiple app identifiers
+  new {
+    name = "multi_app_sync"
+    description = "Sync certificates for multiple apps"
+    actions {
+      new MatchAction {
+        certificateType = "appstore"
+        appIdentifier = "com.example.app"
+      }
+      new MatchAction {
+        certificateType = "appstore"
+        appIdentifier = "com.example.app.share-extension"
+      }
+      new MatchAction {
+        certificateType = "appstore"
+        appIdentifier = "com.example.app.widget"
+      }
+      new MatchAction {
+        certificateType = "appstore"
+        appIdentifier = "com.example.app.watchkitapp"
+      }
+    }
+  }
+
+  // Register devices from dictionary
+  new {
+    name = "register_devices"
+    description = "Register test devices"
+    actions {
+      new RegisterDevicesAction {
+        devices {
+          ["John's iPhone 15 Pro"] = "00008030-001234567890401E"
+          ["Jane's iPad Pro"] = "00008101-000123456789012E"
+          ["QA iPhone 14"] = "00008020-001A1B2C3D4E501F"
+        }
+      }
+    }
+  }
+
+  // CI pipeline with Match
+  new {
+    name = "ci_build"
+    description = "CI build with code signing"
+    actions {
+      new MatchAction {
+        certificateType = "appstore"
+        appIdentifier = "com.example.app"
+        readonly = isCI
+      }
+      new ScanAction {
+        scheme = "MyApp"
+        devices {
+          "iPhone 15 Pro"
+        }
+      }
+      new GymAction {
+        scheme = "MyApp"
+        configuration = "release"
+      }
+      new ArchiveAction {
+        scheme = "MyApp"
+        exportMethod = "app-store"
+      }
+    }
+  }
+}

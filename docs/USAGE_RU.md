@@ -56,6 +56,7 @@ laner doctor
 - Наличие Xcode (только macOS)
 - Доступность xcodebuild
 - Доступность codesign
+- Pkl runtime (встроенный)
 
 ### Шаг 2: Инициализация проекта
 
@@ -66,30 +67,56 @@ cd /путь/к/вашему/проекту
 laner init
 ```
 
-Это создаст файл `Laner/Lanerfile.swift` с примером конфигурации.
+Это создаст `Laner/Lanerfile.pkl` (конфигурация) и `Laner/pkl/Lanerfile.pkl` (схема).
 
 ### Шаг 3: Настройка lanes
 
-Отредактируйте `Laner/Lanerfile.swift` под ваши нужды:
+Отредактируйте `Laner/Lanerfile.pkl` под ваши нужды:
 
-```swift
-import LanerDSL
+```pkl
+amends "pkl/Lanerfile.pkl"
 
-let laner = Lanerfile(
-    lanes: [
-        Lane("build") {
-            gym(scheme: "МойПроект", configuration: .debug)
-        },
-        Lane("test") {
-            scan(scheme: "МойПроектTests", codeCoverage: true)
-        },
-        Lane("release") {
-            match(type: .appstore)
-            gym(scheme: "МойПроект", configuration: .release)
-            archive(scheme: "МойПроект", exportMethod: .appStore)
-        }
-    ]
-)
+lanes {
+  new {
+    name = "build"
+    description = "Сборка приложения"
+    actions {
+      new GymAction {
+        scheme = "МойПроект"
+        configuration = "debug"
+      }
+    }
+  }
+
+  new {
+    name = "test"
+    description = "Запуск тестов"
+    actions {
+      new ScanAction {
+        scheme = "МойПроект"
+        codeCoverage = true
+      }
+    }
+  }
+
+  new {
+    name = "release"
+    description = "Сборка и архивация для релиза"
+    actions {
+      new MatchAction {
+        certificateType = "appstore"
+      }
+      new GymAction {
+        scheme = "МойПроект"
+        configuration = "release"
+      }
+      new ArchiveAction {
+        scheme = "МойПроект"
+        exportMethod = "app-store"
+      }
+    }
+  }
+}
 ```
 
 ### Шаг 4: Запуск lanes
@@ -117,6 +144,18 @@ laner lane release
 | `laner test`              | Запустить тесты              |
 | `laner match sync`        | Синхронизировать сертификаты |
 | `laner upload testflight` | Загрузить в TestFlight       |
+
+## Доступные действия
+
+| Действие                | Описание                                     |
+| ----------------------- | -------------------------------------------- |
+| `GymAction`             | Сборка iOS/macOS приложения через xcodebuild |
+| `ScanAction`            | Запуск тестов через xcodebuild               |
+| `ArchiveAction`         | Архивация приложения и экспорт IPA           |
+| `MatchAction`           | Синхронизация сертификатов и профилей        |
+| `PilotAction`           | Загрузка сборки в TestFlight                 |
+| `RegisterDevicesAction` | Регистрация устройств в Apple Dev Portal     |
+| `ShellAction`           | Выполнение произвольной shell-команды        |
 
 ## Настройка Code Signing (Match)
 
@@ -184,41 +223,104 @@ laner upload testflight --ipa путь/к/app.ipa --app-id 123456789 \
 
 ## Пример полного CI/CD пайплайна
 
-```swift
-import LanerDSL
+```pkl
+amends "pkl/Lanerfile.pkl"
 
-let laner = Lanerfile(
-    lanes: [
-        // Сборка для разработки
-        Lane("dev") {
-            gym(scheme: "App", configuration: .debug)
-        },
+local isCI = read?("env:CI") == "true"
 
-        // Запуск тестов
-        Lane("test") {
-            scan(scheme: "AppTests", codeCoverage: true)
-        },
+lanes {
+  // Сборка для разработки
+  new {
+    name = "dev"
+    description = "Сборка для разработки"
+    actions {
+      new GymAction {
+        scheme = "App"
+        configuration = "debug"
+      }
+    }
+  }
 
-        // Релиз в TestFlight
-        Lane("testflight") {
-            match(type: .appstore, readonly: true)
-            gym(scheme: "App", exportMethod: .appStore)
-            pilot(
-                appId: "123456789",
-                changelog: "Новые функции и исправления",
-                groups: ["Internal Testers"]
-            )
-        },
+  // Запуск тестов
+  new {
+    name = "test"
+    description = "Запуск тестов с покрытием"
+    actions {
+      new ScanAction {
+        scheme = "App"
+        codeCoverage = true
+      }
+    }
+  }
 
-        // Бета-сборка с новыми устройствами
-        Lane("beta") {
-            registerDevices(file: "devices.txt")
-            match(type: .adhoc, forceForNewDevices: true)
-            gym(scheme: "App", configuration: .release)
+  // Релиз в TestFlight
+  new {
+    name = "testflight"
+    description = "Сборка и загрузка в TestFlight"
+    actions {
+      new MatchAction {
+        certificateType = "appstore"
+        readonly = isCI
+      }
+      new GymAction {
+        scheme = "App"
+        configuration = "release"
+      }
+      new ArchiveAction {
+        scheme = "App"
+        exportMethod = "app-store"
+      }
+      new PilotAction {
+        appId = "123456789"
+        changelog = "Новые функции и исправления"
+        groups {
+          "Internal Testers"
         }
-    ]
-)
+      }
+    }
+  }
+
+  // Бета-сборка с новыми устройствами
+  new {
+    name = "beta"
+    description = "Регистрация устройств и бета-сборка"
+    actions {
+      new RegisterDevicesAction {
+        file = "devices.txt"
+      }
+      new MatchAction {
+        certificateType = "adhoc"
+        forceForNewDevices = true
+      }
+      new GymAction {
+        scheme = "App"
+        configuration = "release"
+      }
+    }
+  }
+
+  // Shell-команды
+  new {
+    name = "lint"
+    description = "Запуск линтера"
+    actions {
+      new ShellAction {
+        command = "swiftlint"
+        arguments {}
+      }
+    }
+  }
+}
 ```
+
+## Возможности конфигурации Pkl
+
+Pkl — язык конфигурации от Apple, который обеспечивает:
+
+- **Типобезопасность** — схема валидирует конфигурацию до выполнения
+- **Быстрое вычисление** — миллисекунды вместо секунд (без компиляции)
+- **Условная логика** — используйте `read?("env:CI")` для условий на основе окружения
+- **Без компиляции Swift** — конфигурация полностью декларативна
 
 ## Устранение неполадок
 
@@ -241,3 +343,9 @@ export PATH="$PATH:/путь/к/laner"
 1. Проверьте API ключи App Store Connect
 2. Убедитесь, что App ID корректен
 3. Используйте `--verbose` для отладки
+
+### Ошибки вычисления Pkl
+
+1. Проверьте синтаксис `Laner/Lanerfile.pkl`
+2. Убедитесь, что файл схемы `Laner/pkl/Lanerfile.pkl` существует
+3. Запустите `laner doctor` для валидации конфигурации

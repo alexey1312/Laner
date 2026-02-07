@@ -39,50 +39,6 @@ struct PilotActionTests {
         #expect(PilotAction.description == "Upload a build to TestFlight")
     }
 
-    @Test("PilotAction can be type-erased")
-    func pilotActionTypeErasure() {
-        let options = PilotOptions(ipa: "/path/to/app.ipa")
-        let action = PilotAction(options: options)
-        let anyAction = AnyAction(action)
-
-        #expect(anyAction.name == "pilot")
-        #expect(anyAction.description == "Upload a build to TestFlight")
-    }
-
-    @Test("pilot() DSL function creates AnyAction")
-    func pilotDSLFunction() {
-        let action = pilot(ipa: "/path/to/app.ipa")
-
-        #expect(action.name == "pilot")
-    }
-
-    @Test("pilot() DSL function with all parameters")
-    func pilotDSLFunctionAllParameters() {
-        let action = pilot(
-            ipa: "/path/to/app.ipa",
-            appId: "123456789",
-            changelog: "New features",
-            groups: ["QA", "Beta Testers"],
-            skipWaitingForProcessing: false
-        )
-
-        #expect(action.name == "pilot")
-    }
-
-    @Test("uploadToTestFlight() is an alias for pilot()")
-    func uploadToTestFlightAlias() {
-        let pilotAction = pilot(
-            ipa: "/path/to/app.ipa",
-            appId: "123456789"
-        )
-        let uploadAction = uploadToTestFlight(
-            ipa: "/path/to/app.ipa",
-            appId: "123456789"
-        )
-
-        #expect(pilotAction.name == uploadAction.name)
-    }
-
     @Test("PilotActionError descriptions")
     func pilotActionErrorDescriptions() {
         let missingIpaError = PilotActionError.missingIPA
@@ -141,17 +97,6 @@ struct PilotIntegrationTests {
         #expect(options.groups!.isEmpty)
     }
 
-    @Test("PilotOptions with single group")
-    func pilotOptionsSingleGroup() {
-        let options = PilotOptions(
-            ipa: "/path/to/app.ipa",
-            groups: ["Beta Testers"]
-        )
-
-        #expect(options.groups?.count == 1)
-        #expect(options.groups?.first == "Beta Testers")
-    }
-
     @Test("PilotOptions with multiple groups")
     func pilotOptionsMultipleGroups() {
         let options = PilotOptions(
@@ -160,35 +105,5 @@ struct PilotIntegrationTests {
         )
 
         #expect(options.groups?.count == 4)
-    }
-
-    @Test("pilot() works in lane context")
-    func pilotInLaneContext() {
-        // Verify pilot() returns an action that can be used in a lane
-        let actions = [
-            pilot(ipa: "/path/to/app.ipa", appId: "123456789"),
-        ]
-
-        #expect(actions.count == 1)
-        #expect(actions[0].name == "pilot")
-    }
-
-    @Test("pilot() combined with other actions")
-    func pilotWithOtherActions() {
-        // Simulate a typical beta release lane
-        let actions: [AnyAction] = [
-            match(type: .appstore, readonly: true),
-            gym(scheme: "MyApp", configuration: .release),
-            pilot(
-                appId: "123456789",
-                changelog: "Bug fixes",
-                groups: ["Internal Testers"]
-            ),
-        ]
-
-        #expect(actions.count == 3)
-        #expect(actions[0].name == "match")
-        #expect(actions[1].name == "gym")
-        #expect(actions[2].name == "pilot")
     }
 }

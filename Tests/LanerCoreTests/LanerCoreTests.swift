@@ -198,7 +198,7 @@ struct ManifestCacheTests {
     @Test("Computes hash for nonexistent file throws")
     func computeHashForNonexistentFileThrows() throws {
         let cache = ManifestCache()
-        let nonexistent = URL(fileURLWithPath: "/nonexistent/path/Lanerfile.swift")
+        let nonexistent = URL(fileURLWithPath: "/nonexistent/path/Lanerfile.pkl")
         #expect(throws: (any Error).self) {
             try cache.computeHash(for: nonexistent)
         }
@@ -216,22 +216,17 @@ struct ManifestErrorTests {
         #expect(error.errorDescription?.contains("not found") == true)
     }
 
-    @Test("compilationFailed error includes output")
-    func compilationFailedErrorIncludesOutput() {
-        let error = ManifestError.compilationFailed(output: "compilation error")
-        #expect(error.errorDescription?.contains("compilation error") == true)
+    @Test("evaluationFailed error includes details")
+    func evaluationFailedErrorIncludesDetails() {
+        let error = ManifestError.evaluationFailed(details: "Pkl evaluation error")
+        #expect(error.errorDescription?.contains("Pkl evaluation error") == true)
     }
 
-    @Test("executionFailed error includes output")
-    func executionFailedErrorIncludesOutput() {
-        let error = ManifestError.executionFailed(output: "execution error")
-        #expect(error.errorDescription?.contains("execution error") == true)
-    }
-
-    @Test("invalidOutput error has message")
-    func invalidOutputErrorHasMessage() {
-        let error = ManifestError.invalidOutput(details: "parse error")
-        #expect(error.errorDescription?.isEmpty == false)
+    @Test("versionMismatch error includes versions")
+    func versionMismatchErrorIncludesVersions() {
+        let error = ManifestError.versionMismatch(expected: "2.0", found: "1.0")
+        #expect(error.errorDescription?.contains("2.0") == true)
+        #expect(error.errorDescription?.contains("1.0") == true)
     }
 }
 

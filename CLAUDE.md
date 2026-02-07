@@ -43,16 +43,17 @@ modules[6]{name,description}:
 ## Dependencies
 
 ```toon
-dependencies[4]{package,purpose}:
+dependencies[5]{package,purpose}:
   swift-argument-parser,CLI parsing
   swift-log,Logging
   swift-crypto,AES-256-GCM encryption for Match
   async-http-client,App Store Connect API requests
+  pkl-swift,Pkl configuration language evaluator
 ```
 
 ## Platform
 
-macOS 13+, Swift 6.0
+macOS 13+, Swift 6.0+
 
 ## Maintaining This Document
 
@@ -125,48 +126,48 @@ LanerPluginKit (Plugin Development)
 
 `LanerDSL` uses `@_exported import` to re-export `LanerKit` and `LanerMatch`. Users only need `import LanerDSL` to access the full public API. `LanerCore` is internal — it's only consumed by the `laner` executable, never exposed as a library product.
 
-### Manifest Compilation Flow
+### Manifest Evaluation Flow
 
-User manifests (`Laner/Lanerfile.swift`) are **compiled into a separate executable**, not evaluated at runtime:
+User manifests (`Laner/Lanerfile.pkl`) are **evaluated using the embedded Pkl runtime**, not compiled:
 
-1. `ManifestLoader` discovers `Laner/Lanerfile.swift` (+ optional `LanerHelpers/`)
-2. `ManifestCache` checks SHA256 hash — skips recompilation if unchanged
-3. `ManifestCompiler` creates a temporary Swift package with a local path dependency to LanerDSL
-4. The temp package builds with `swift build -c release`
-5. The compiled binary runs and outputs the manifest as **JSON to stdout**
-6. JSON is decoded into a `Lanerfile` struct
+1. `ManifestLoader` discovers `Laner/Lanerfile.pkl`
+2. `ManifestCache` checks SHA256 hash for change detection
+3. Pkl evaluator loads and validates the `.pkl` file against the schema
+4. Pkl output is decoded into `Lanerfile.Module` (generated Swift types)
+5. `ActionDispatcher` maps Pkl action types to Swift `Action` implementations
 
-This enables full Swift language features in configuration while keeping execution safe and cacheable.
+This provides type-safe, validated configuration that evaluates in milliseconds with no compilation step.
 
 ### Key Source Files
 
 ```toon
-sources[15]{path,description}:
+sources[17]{path,description}:
   Sources/laner/main.swift,CLI entry with ArgumentParser
   Sources/LanerCore/Commands/,Build, Test, Doctor, Version, Init, Lane, Lanes, Match, Upload commands
-  Sources/LanerCore/Manifest/,ManifestCompiler, ManifestCache, ManifestLoader
-  Sources/LanerDSL/Lane.swift,Lane definition and execution
+  Sources/LanerCore/Manifest/,ManifestCache, ManifestLoader, ManifestError
+  Sources/LanerDSL/Lane.swift,LaneRunner and LaneResult
   Sources/LanerDSL/Action.swift,Action protocol
+  Sources/LanerDSL/ActionDispatcher.swift,Maps Pkl action types to Swift Action implementations
+  Sources/LanerDSL/PklTypeConversions.swift,Pkl enum to Swift enum conversions
   Sources/LanerDSL/ExecutionContext.swift,@MainActor execution environment
-  Sources/LanerDSL/Builders/LaneBuilder.swift,Result builder for declarative lane DSL
-  Sources/LanerDSL/Manifest/Lanerfile.swift,Root manifest type
-  Sources/LanerDSL/Actions/Functions.swift,"gym(), scan(), archive() DSL functions"
-  Sources/LanerDSL/Actions/PilotAction.swift,"pilot(), uploadToTestFlight() DSL functions"
+  Sources/LanerDSL/Generated/Lanerfile.pkl.swift,Generated Swift types from Pkl schema
+  Sources/LanerDSL/Resources/pkl/Lanerfile.pkl,Pkl schema definition
+  Sources/LanerDSL/Manifest/Lanerfile.swift,Convenience extensions on Lanerfile.Module
+  Sources/LanerDSL/Actions/Functions.swift,"GymAction, ScanAction, ArchiveAction implementations"
+  Sources/LanerDSL/Actions/ShellActionImpl.swift,Shell command execution action
   Sources/LanerKit/ShellExecutor.swift,Actor for shell commands
   Sources/LanerKit/Xcodebuild/,xcodebuild wrapper types
   Sources/LanerMatch/Services/TestFlightService.swift,TestFlight upload and distribution
   Sources/LanerMatch/Services/ChunkedUploader.swift,Build Upload API v4.1+ chunked uploads
-  Sources/LanerMatch/API/AppStoreConnectAPI+Builds.swift,Build and beta group API extensions
 ```
 
 ## Concurrency Model
 
 ```toon
-actors[11]{type,description}:
+actors[10]{type,description}:
   ShellExecutor,Actor for thread-safe command execution
   ExecutionContext,@MainActor for isolated execution environment
   ArtifactStore,Actor for thread-safe artifact management
-  ManifestCompiler,Actor for thread-safe manifest compilation
   CryptoService,Actor for AES-256-GCM encryption
   GitStorage,Actor for Git repository operations
   KeychainService,Actor for macOS Keychain operations
@@ -211,7 +212,7 @@ swift test --filter LanerKitTests.ShellExecutorTests/runEchoCommand 2>&1 | xcsif
 commands[9]{name,description}:
   version,Show version info
   doctor,Check environment (Swift, Git, Xcode, etc.)
-  init,Initialize Laner project (creates Lanerfile.swift)
+  init,Initialize Laner project (creates Lanerfile.pkl)
   lanes,List available lanes from manifest
   lane <name>,Execute a lane by name
   build,Build iOS/macOS project
@@ -225,9 +226,9 @@ commands[9]{name,description}:
 ```toon
 conventions[6]{pattern,usage}:
   Actor-based concurrency,I/O operations
-  Protocol-driven design,Action and LanerConfiguration protocols
-  Type erasure,AnyAction for heterogeneous collections
-  Result builders,LaneBuilder for declarative DSL
+  Protocol-driven design,Action protocol
+  Pkl configuration,Declarative typed config via Lanerfile.pkl
+  Action dispatching,ActionDispatcher maps Pkl actions to Swift implementations
   Builder pattern,Context modifications
   Re-export dependencies,@_exported import
 ```
@@ -273,7 +274,7 @@ Pre-commit and commit-msg hooks are configured in `.githooks/` and activated via
 
 ## Examples
 
-`Examples/` contains reference manifests: `BasicLanerfile.swift`, `DSLActionsExample.swift`, `MatchConfig.swift`, etc. Use these as templates when implementing new DSL features.
+`Examples/` contains reference Pkl manifests: `BasicLanerfile.pkl`, `FullPipeline.pkl`, `MatchConfig.pkl`. Use these as templates when implementing new actions.
 
 ## External Documentation
 

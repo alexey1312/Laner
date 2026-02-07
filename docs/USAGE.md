@@ -56,6 +56,7 @@ This checks:
 - Xcode availability (macOS only)
 - xcodebuild availability
 - codesign availability
+- Pkl runtime (embedded)
 
 ### Step 2: Initialize Project
 
@@ -66,30 +67,56 @@ cd /path/to/your/project
 laner init
 ```
 
-This creates `Laner/Lanerfile.swift` with an example configuration.
+This creates `Laner/Lanerfile.pkl` (your pipeline config) and `Laner/pkl/Lanerfile.pkl` (the schema).
 
 ### Step 3: Configure Lanes
 
-Edit `Laner/Lanerfile.swift` to match your needs:
+Edit `Laner/Lanerfile.pkl` to match your needs:
 
-```swift
-import LanerDSL
+```pkl
+amends "pkl/Lanerfile.pkl"
 
-let laner = Lanerfile(
-    lanes: [
-        Lane("build") {
-            gym(scheme: "MyProject", configuration: .debug)
-        },
-        Lane("test") {
-            scan(scheme: "MyProjectTests", codeCoverage: true)
-        },
-        Lane("release") {
-            match(type: .appstore)
-            gym(scheme: "MyProject", configuration: .release)
-            archive(scheme: "MyProject", exportMethod: .appStore)
-        }
-    ]
-)
+lanes {
+  new {
+    name = "build"
+    description = "Build the app"
+    actions {
+      new GymAction {
+        scheme = "MyProject"
+        configuration = "debug"
+      }
+    }
+  }
+
+  new {
+    name = "test"
+    description = "Run tests"
+    actions {
+      new ScanAction {
+        scheme = "MyProject"
+        codeCoverage = true
+      }
+    }
+  }
+
+  new {
+    name = "release"
+    description = "Build and archive for release"
+    actions {
+      new MatchAction {
+        certificateType = "appstore"
+      }
+      new GymAction {
+        scheme = "MyProject"
+        configuration = "release"
+      }
+      new ArchiveAction {
+        scheme = "MyProject"
+        exportMethod = "app-store"
+      }
+    }
+  }
+}
 ```
 
 ### Step 4: Run Lanes
@@ -117,6 +144,18 @@ laner lane release
 | `laner test`              | Run tests            |
 | `laner match sync`        | Sync certificates    |
 | `laner upload testflight` | Upload to TestFlight |
+
+## Available Actions
+
+| Action                  | Description                             |
+| ----------------------- | --------------------------------------- |
+| `GymAction`             | Build an iOS/macOS app using xcodebuild |
+| `ScanAction`            | Run tests using xcodebuild              |
+| `ArchiveAction`         | Archive an app and export an IPA        |
+| `MatchAction`           | Sync code signing certificates/profiles |
+| `PilotAction`           | Upload a build to TestFlight            |
+| `RegisterDevicesAction` | Register devices with Apple Dev Portal  |
+| `ShellAction`           | Execute an arbitrary shell command      |
 
 ## Code Signing Setup (Match)
 
@@ -184,41 +223,104 @@ All commands support:
 
 ## Complete CI/CD Pipeline Example
 
-```swift
-import LanerDSL
+```pkl
+amends "pkl/Lanerfile.pkl"
 
-let laner = Lanerfile(
-    lanes: [
-        // Development build
-        Lane("dev") {
-            gym(scheme: "App", configuration: .debug)
-        },
+local isCI = read?("env:CI") == "true"
 
-        // Run tests
-        Lane("test") {
-            scan(scheme: "AppTests", codeCoverage: true)
-        },
+lanes {
+  // Development build
+  new {
+    name = "dev"
+    description = "Build for development"
+    actions {
+      new GymAction {
+        scheme = "App"
+        configuration = "debug"
+      }
+    }
+  }
 
-        // Release to TestFlight
-        Lane("testflight") {
-            match(type: .appstore, readonly: true)
-            gym(scheme: "App", exportMethod: .appStore)
-            pilot(
-                appId: "123456789",
-                changelog: "New features and bug fixes",
-                groups: ["Internal Testers"]
-            )
-        },
+  // Run tests
+  new {
+    name = "test"
+    description = "Run tests with coverage"
+    actions {
+      new ScanAction {
+        scheme = "App"
+        codeCoverage = true
+      }
+    }
+  }
 
-        // Beta build with new devices
-        Lane("beta") {
-            registerDevices(file: "devices.txt")
-            match(type: .adhoc, forceForNewDevices: true)
-            gym(scheme: "App", configuration: .release)
+  // Release to TestFlight
+  new {
+    name = "testflight"
+    description = "Build and upload to TestFlight"
+    actions {
+      new MatchAction {
+        certificateType = "appstore"
+        readonly = isCI
+      }
+      new GymAction {
+        scheme = "App"
+        configuration = "release"
+      }
+      new ArchiveAction {
+        scheme = "App"
+        exportMethod = "app-store"
+      }
+      new PilotAction {
+        appId = "123456789"
+        changelog = "New features and bug fixes"
+        groups {
+          "Internal Testers"
         }
-    ]
-)
+      }
+    }
+  }
+
+  // Beta build with new devices
+  new {
+    name = "beta"
+    description = "Register devices and build beta"
+    actions {
+      new RegisterDevicesAction {
+        file = "devices.txt"
+      }
+      new MatchAction {
+        certificateType = "adhoc"
+        forceForNewDevices = true
+      }
+      new GymAction {
+        scheme = "App"
+        configuration = "release"
+      }
+    }
+  }
+
+  // Run shell commands
+  new {
+    name = "lint"
+    description = "Run linting"
+    actions {
+      new ShellAction {
+        command = "swiftlint"
+        arguments {}
+      }
+    }
+  }
+}
 ```
+
+## Pkl Configuration Features
+
+Pkl is Apple's configuration language that provides:
+
+- **Type safety** - Schema validation catches errors before execution
+- **Fast evaluation** - Milliseconds instead of seconds (no compilation)
+- **Conditional logic** - Use `read?("env:CI")` for environment-based config
+- **No Swift compilation** - Configuration is purely declarative
 
 ## Troubleshooting
 
@@ -241,3 +343,9 @@ export PATH="$PATH:/path/to/laner"
 1. Verify App Store Connect API keys
 2. Ensure App ID is correct
 3. Use `--verbose` for debugging
+
+### Pkl Evaluation Errors
+
+1. Check `Laner/Lanerfile.pkl` syntax
+2. Ensure `Laner/pkl/Lanerfile.pkl` schema exists
+3. Run `laner doctor` to validate the configuration

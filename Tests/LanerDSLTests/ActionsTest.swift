@@ -2,103 +2,76 @@ import Foundation
 @testable import LanerDSL
 import Testing
 
-/// Tests for DSL action functions (gym, scan, archive)
-@Suite("DSL Action Functions Tests")
+/// Tests for action implementations and enums.
+@Suite("Action Implementation Tests")
 struct ActionsTest {
-    // MARK: - gym() tests
+    // MARK: - GymAction tests
 
-    @Test("gym creates GymAction with default configuration")
-    func gymCreatesActionWithDefaults() {
-        let action = gym(scheme: "MyApp")
-
-        #expect(action.name == "gym")
-        #expect(action.description == "Build an iOS/macOS app using xcodebuild")
+    @Test("GymAction has correct metadata")
+    func gymActionMetadata() {
+        #expect(GymAction.name == "gym")
+        #expect(GymAction.description == "Build an iOS/macOS app using xcodebuild")
     }
 
-    @Test("gym creates GymAction with full configuration")
-    func gymCreatesActionWithFullConfiguration() {
-        let action = gym(
-            scheme: "MyApp",
-            workspace: "MyApp.xcworkspace",
-            project: nil,
-            configuration: .release,
-            destination: "generic/platform=iOS"
-        )
-
-        #expect(action.name == "gym")
-    }
-
-    @Test("gym executes without throwing")
+    @Test("GymAction executes without throwing")
     @MainActor
-    func gymExecutesWithoutThrowing() async throws {
-        let action = gym(scheme: "TestScheme")
-        let context = ExecutionContext()
-
-        try await action.execute(context: context)
-        // If we get here without throwing, the action executed
-    }
-
-    // MARK: - scan() tests
-
-    @Test("scan creates ScanAction with default configuration")
-    func scanCreatesActionWithDefaults() {
-        let action = scan(scheme: "MyApp")
-
-        #expect(action.name == "scan")
-        #expect(action.description == "Run tests using xcodebuild")
-    }
-
-    @Test("scan creates ScanAction with full configuration")
-    func scanCreatesActionWithFullConfiguration() {
-        let action = scan(
-            scheme: "MyApp",
-            workspace: "MyApp.xcworkspace",
-            devices: ["iPhone 15 Pro", "iPad Pro"],
-            codeCoverage: true
+    func gymActionExecutes() async throws {
+        let action = GymAction(
+            options: GymOptions(
+                scheme: "TestScheme",
+                workspace: nil,
+                project: nil,
+                configuration: .debug,
+                destination: nil
+            )
         )
-
-        #expect(action.name == "scan")
-    }
-
-    @Test("scan executes without throwing")
-    @MainActor
-    func scanExecutesWithoutThrowing() async throws {
-        let action = scan(scheme: "TestScheme", codeCoverage: true)
         let context = ExecutionContext()
-
         try await action.execute(context: context)
-        // If we get here without throwing, the action executed
     }
 
-    // MARK: - archive() tests
+    // MARK: - ScanAction tests
 
-    @Test("archive creates ArchiveAction with default configuration")
-    func archiveCreatesActionWithDefaults() {
-        let action = archive(scheme: "MyApp")
-
-        #expect(action.name == "archive")
-        #expect(action.description == "Archive an app and export an IPA")
+    @Test("ScanAction has correct metadata")
+    func scanActionMetadata() {
+        #expect(ScanAction.name == "scan")
+        #expect(ScanAction.description == "Run tests using xcodebuild")
     }
 
-    @Test("archive creates ArchiveAction with full configuration")
-    func archiveCreatesActionWithFullConfiguration() {
-        let action = archive(
-            scheme: "MyApp",
-            configuration: .release,
-            exportMethod: .adHoc
+    @Test("ScanAction executes without throwing")
+    @MainActor
+    func scanActionExecutes() async throws {
+        let action = ScanAction(
+            options: ScanOptions(
+                scheme: "TestScheme",
+                workspace: nil,
+                devices: nil,
+                codeCoverage: true
+            )
         )
-
-        #expect(action.name == "archive")
+        let context = ExecutionContext()
+        try await action.execute(context: context)
     }
 
-    @Test("archive executes without throwing")
-    @MainActor
-    func archiveExecutesWithoutThrowing() async throws {
-        let action = archive(scheme: "TestScheme", exportMethod: .development)
-        let context = ExecutionContext()
+    // MARK: - ArchiveAction tests
 
+    @Test("ArchiveAction has correct metadata")
+    func archiveActionMetadata() {
+        #expect(ArchiveAction.name == "archive")
+        #expect(ArchiveAction.description == "Archive an app and export an IPA")
+    }
+
+    @Test("ArchiveAction executes without throwing")
+    @MainActor
+    func archiveActionExecutes() async throws {
+        let action = ArchiveAction(
+            options: ArchiveOptions(
+                scheme: "TestScheme",
+                configuration: .release,
+                exportMethod: .development
+            )
+        )
+        let context = ExecutionContext()
         try await action.execute(context: context)
-        // If we get here without throwing, the action executed
     }
 
     // MARK: - Enum tests
@@ -115,21 +88,5 @@ struct ActionsTest {
         #expect(ExportMethod.adHoc.rawValue == "ad-hoc")
         #expect(ExportMethod.development.rawValue == "development")
         #expect(ExportMethod.enterprise.rawValue == "enterprise")
-    }
-
-    // MARK: - Integration tests
-
-    @Test("can use DSL functions in a lane")
-    @MainActor
-    func canUseDSLFunctionsInLane() async throws {
-        let lane = Lane(name: "test") { context in
-            try await gym(scheme: "MyApp").execute(context: context)
-            try await scan(scheme: "MyApp").execute(context: context)
-            try await archive(scheme: "MyApp").execute(context: context)
-        }
-
-        let context = ExecutionContext()
-        try await lane.execute(context: context)
-        // If we get here, all actions executed successfully
     }
 }

@@ -256,146 +256,68 @@ struct ActionTests {
     }
 }
 
-// MARK: - AnyAction Tests
-
-@Suite("AnyAction Tests")
-struct AnyActionTests {
-    @Test("wraps action with name")
-    func wrapsActionWithName() {
-        let action = EchoAction(message: "test")
-        let anyAction = AnyAction(action)
-
-        #expect(anyAction.name == "echo")
-        #expect(anyAction.description == "Echoes a message")
-    }
-
-    @Test("executes wrapped action")
-    @MainActor
-    func executesWrappedAction() async throws {
-        let action = EchoAction(message: "wrapped")
-        let anyAction = AnyAction(action)
-        let context = ExecutionContext()
-
-        try await anyAction.execute(context: context)
-        // If we get here without throwing, the action executed
-    }
-}
-
-// MARK: - Lane Tests
-
-@Suite("Lane Tests")
-struct LaneTests {
-    @Test("creates lane with name and description")
-    func createsLaneWithNameAndDescription() {
-        let lane = Lane(name: "build", description: "Builds the app") { _ in }
-
-        #expect(lane.name == "build")
-        #expect(lane.description == "Builds the app")
-    }
-
-    @Test("creates lane from actions")
-    func createsLaneFromActions() {
-        let actions = [
-            AnyAction(EchoAction(message: "step 1")),
-            AnyAction(EchoAction(message: "step 2")),
-        ]
-        let lane = Lane(name: "multi", actions: actions)
-
-        #expect(lane.name == "multi")
-    }
-
-    @Test("executes lane body")
-    @MainActor
-    func executesLaneBody() async throws {
-        var executed = false
-        let lane = Lane(name: "test") { _ in
-            executed = true
-        }
-        let context = ExecutionContext()
-
-        try await lane.execute(context: context)
-        #expect(executed)
-    }
-
-    @Test("executes lane actions in order")
-    @MainActor
-    func executesLaneActionsInOrder() async throws {
-        var order: [String] = []
-
-        let lane = Lane(name: "ordered") { _ in
-            order.append("first")
-            order.append("second")
-            order.append("third")
-        }
-
-        let context = ExecutionContext()
-        try await lane.execute(context: context)
-
-        #expect(order == ["first", "second", "third"])
-    }
-}
-
 // MARK: - LaneRunner Tests
 
 @Suite("LaneRunner Tests")
 struct LaneRunnerTests {
-    @Test("runs successful lane")
-    @MainActor
-    func runsSuccessfulLane() async {
-        let lane = Lane(name: "success") { _ in
-            // Do nothing - success
-        }
+    @Test("LaneRunner can be created")
+    func laneRunnerCanBeCreated() {
         let runner = LaneRunner()
-        let result = await runner.run(lane)
-
-        #expect(result.success)
-        #expect(result.laneName == "success")
-        #expect(result.error == nil)
+        _ = runner
     }
 
-    @Test("runs failing lane")
+    @Test("LaneRunner executes successful lane")
     @MainActor
-    func runsFailingLane() async {
-        struct TestError: Error {}
-        let lane = Lane(name: "expectedFailure") { _ in
-            throw TestError()
-        }
-        // Use a silent logger to avoid xcsift parsing the expected error log as a test failure
-        var silentLogger = Logger(label: "test.silent")
-        silentLogger.logLevel = .critical
-        let runner = LaneRunner(logger: silentLogger)
-        let result = await runner.run(lane)
+    func laneRunnerExecutesSuccessfulLane() async {
+        let runner = LaneRunner()
+        let lane = Lanerfile.Lane(
+            name: "test-success",
+            description: "A successful lane",
+            actions: [
+                Lanerfile.ShellAction(command: "echo", arguments: ["test"], type: "shell"),
+            ]
+        )
+        let context = ExecutionContext()
+        let result = await runner.run(lane, context: context)
 
-        #expect(!result.success)
-        #expect(result.laneName == "expectedFailure")
+        #expect(result.success == true)
+        #expect(result.laneName == "test-success")
+    }
+
+    @Test("LaneRunner executes failing lane")
+    @MainActor
+    func laneRunnerExecutesFailingLane() async {
+        let runner = LaneRunner()
+        let lane = Lanerfile.Lane(
+            name: "test-failure",
+            description: "A failing lane",
+            actions: [
+                Lanerfile.ShellAction(command: "false", arguments: [], type: "shell"),
+            ]
+        )
+        let context = ExecutionContext()
+        let result = await runner.run(lane, context: context)
+
+        #expect(result.success == false)
         #expect(result.error != nil)
+        #expect(result.laneName == "test-failure")
     }
 
-    @Test("collects artifacts from lane")
+    @Test("LaneRunner tracks execution duration")
     @MainActor
-    func collectsArtifactsFromLane() async {
-        let lane = Lane(name: "artifacts") { context in
-            await context.addArtifact(Artifact(type: .ipa, path: URL(fileURLWithPath: "/tmp/app.ipa")))
-        }
+    func laneRunnerTracksExecutionDuration() async {
         let runner = LaneRunner()
-        let result = await runner.run(lane)
+        let lane = Lanerfile.Lane(
+            name: "test-duration",
+            description: "Test duration tracking",
+            actions: [
+                Lanerfile.ShellAction(command: "echo", arguments: ["timing"], type: "shell"),
+            ]
+        )
+        let context = ExecutionContext()
+        let result = await runner.run(lane, context: context)
 
-        #expect(result.artifacts.count == 1)
-        #expect(result.artifacts.first?.type == .ipa)
-    }
-
-    @Test("tracks execution duration")
-    @MainActor
-    func tracksExecutionDuration() async {
-        let lane = Lane(name: "timed") { _ in
-            try? await Task.sleep(for: .milliseconds(50))
-        }
-        let runner = LaneRunner()
-        let result = await runner.run(lane)
-
-        let durationMS = Double(result.duration.components.seconds) * 1000 +
-            Double(result.duration.components.attoseconds) / 1e15
-        #expect(durationMS >= 50)
+        #expect(result.duration > .zero)
     }
 }
 
@@ -468,75 +390,5 @@ struct ExecutionContextTests {
         let b: String? = subContext.parameter("b")
         #expect(a == "1")
         #expect(b == "2")
-    }
-}
-
-// MARK: - LanerConfiguration Tests
-
-@Suite("LanerConfiguration Tests")
-struct LanerConfigurationTests {
-    struct TestConfig: LanerConfiguration {
-        static var lanes: [Lane] {
-            [
-                Lane(name: "build", description: "Builds the app") { _ in },
-                Lane(name: "test", description: "Runs tests") { _ in },
-            ]
-        }
-    }
-
-    @Test("finds lane by name")
-    func findsLaneByName() {
-        let lane = TestConfig.lane(named: "build")
-        #expect(lane?.name == "build")
-    }
-
-    @Test("returns nil for missing lane")
-    func returnsNilForMissingLane() {
-        let lane = TestConfig.lane(named: "nonexistent")
-        #expect(lane == nil)
-    }
-
-    @Test("validates unique lane names")
-    func validatesUniqueLaneNames() throws {
-        struct ValidConfig: LanerConfiguration {
-            static var lanes: [Lane] {
-                [
-                    Lane(name: "a") { _ in },
-                    Lane(name: "b") { _ in },
-                ]
-            }
-        }
-        try ValidConfig.validate() // Should not throw
-    }
-
-    @Test("throws for duplicate lane names")
-    func throwsForDuplicateLaneNames() {
-        struct DuplicateConfig: LanerConfiguration {
-            static var lanes: [Lane] {
-                [
-                    Lane(name: "same") { _ in },
-                    Lane(name: "same") { _ in },
-                ]
-            }
-        }
-        #expect(throws: ConfigurationError.self) {
-            try DuplicateConfig.validate()
-        }
-    }
-
-    @Test("runs lane by name")
-    @MainActor
-    func runsLaneByName() async throws {
-        let result = try await TestConfig.runLane(named: "build")
-        #expect(result.success)
-        #expect(result.laneName == "build")
-    }
-
-    @Test("throws for missing lane name")
-    @MainActor
-    func throwsForMissingLaneName() async {
-        await #expect(throws: ConfigurationError.self) {
-            _ = try await TestConfig.runLane(named: "nonexistent")
-        }
     }
 }

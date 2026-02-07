@@ -2,102 +2,6 @@ import Foundation
 import LanerKit
 import Logging
 
-/// Represents a CI/CD lane containing a sequence of actions.
-///
-/// A lane is a named workflow that executes a series of actions in order.
-/// Lanes are the primary unit of execution in Laner.
-///
-/// ## Example
-/// ```swift
-/// let buildLane = Lane(
-///     name: "build",
-///     description: "Builds the iOS app for testing"
-/// ) { context in
-///     try await BuildAction(options: .init(configuration: .debug)).execute(context: context)
-///     try await TestAction(options: .init()).execute(context: context)
-/// }
-/// ```
-public struct Lane: Sendable {
-    /// The unique name of this lane.
-    public let name: String
-
-    /// A human-readable description of what this lane does.
-    public let description: String
-
-    /// The execution closure that runs the lane's actions.
-    private let body: @MainActor @Sendable (ExecutionContext) async throws -> Void
-
-    /// Creates a new lane with a name and execution body.
-    /// - Parameters:
-    ///   - name: The unique name for this lane.
-    ///   - description: A description of what this lane does. Defaults to empty.
-    ///   - body: The closure containing the lane's actions.
-    public init(
-        name: String,
-        description: String = "",
-        body: @MainActor @escaping @Sendable (ExecutionContext) async throws -> Void
-    ) {
-        self.name = name
-        self.description = description
-        self.body = body
-    }
-
-    /// Creates a new lane from a sequence of actions.
-    /// - Parameters:
-    ///   - name: The unique name for this lane.
-    ///   - description: A description of what this lane does.
-    ///   - actions: The actions to execute in order.
-    public init(
-        name: String,
-        description: String = "",
-        actions: [AnyAction]
-    ) {
-        self.name = name
-        self.description = description
-        body = { context in
-            for action in actions {
-                try await action.execute(context: context)
-            }
-        }
-    }
-
-    /// Creates a new lane using a result builder for declarative action composition.
-    /// - Parameters:
-    ///   - name: The unique name for this lane.
-    ///   - description: A description of what this lane does.
-    ///   - actions: A result builder closure that constructs the actions.
-    ///
-    /// ## Example
-    /// ```swift
-    /// Lane("build") {
-    ///     AnyAction(gym(scheme: "App", configuration: .debug))
-    ///     AnyAction(scan(scheme: "AppTests", codeCoverage: true))
-    /// }
-    /// ```
-    public init(
-        _ name: String,
-        description: String = "",
-        @LaneBuilder actions: () -> [AnyAction]
-    ) {
-        self.name = name
-        self.description = description
-        let actionArray = actions()
-        body = { context in
-            for action in actionArray {
-                try await action.execute(context: context)
-            }
-        }
-    }
-
-    /// Executes the lane within the given context.
-    /// - Parameter context: The execution context.
-    /// - Throws: Any error from the lane's actions.
-    @MainActor
-    public func execute(context: ExecutionContext) async throws {
-        try await body(context)
-    }
-}
-
 /// Result of lane execution.
 public struct LaneResult: Sendable {
     /// The name of the lane that was executed.
@@ -147,24 +51,26 @@ public struct LaneResult: Sendable {
     }
 }
 
-/// A runner that executes lanes with proper setup and teardown.
+/// A runner that executes Pkl-defined lanes via ActionDispatcher.
 public struct LaneRunner: Sendable {
     private let logger: Logger
+    private let dispatcher: ActionDispatcher
 
     /// Creates a new lane runner.
     /// - Parameter logger: The logger to use for execution output.
     public init(logger: Logger = Logger.laner(.dsl)) {
         self.logger = logger
+        dispatcher = ActionDispatcher(logger: logger)
     }
 
-    /// Executes a lane and returns the result.
+    /// Executes a Pkl lane and returns the result.
     /// - Parameters:
-    ///   - lane: The lane to execute.
+    ///   - lane: The Pkl lane to execute.
     ///   - context: The execution context. If nil, a new one is created.
     /// - Returns: The result of lane execution.
     @MainActor
     public func run(
-        _ lane: Lane,
+        _ lane: Lanerfile.Lane,
         context: ExecutionContext? = nil
     ) async -> LaneResult {
         let executionContext = context ?? ExecutionContext(logger: logger)
@@ -173,7 +79,7 @@ public struct LaneRunner: Sendable {
         logger.info("Starting lane: \(lane.name)")
 
         do {
-            try await lane.execute(context: executionContext)
+            try await dispatcher.executeLane(lane, context: executionContext)
 
             let duration = ContinuousClock.now - startTime
             let artifacts = await executionContext.artifacts.all()

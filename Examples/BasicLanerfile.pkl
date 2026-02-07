@@ -1,0 +1,56 @@
+// BasicLanerfile.pkl
+// Example Laner configuration file demonstrating basic usage.
+//
+// To use this file:
+// 1. Run `laner init` in your project to create `Laner/Lanerfile.pkl`
+// 2. Replace the generated content with this template
+// 3. Run lanes using the laner CLI
+
+amends "pkl/Lanerfile.pkl"
+
+lanes {
+  // Build the app for development
+  new {
+    name = "build"
+    description = "Build the app for development"
+    actions {
+      new GymAction {
+        scheme = "App"
+        configuration = "debug"
+      }
+    }
+  }
+
+  // Run all unit and UI tests
+  new {
+    name = "test"
+    description = "Run all unit and UI tests"
+    actions {
+      new ScanAction {
+        scheme = "App"
+        codeCoverage = true
+      }
+    }
+  }
+
+  // Build and archive for release
+  new {
+    name = "release"
+    description = "Build and archive for release"
+    actions {
+      new MatchAction {
+        certificateType = "appstore"
+        readonly = true
+      }
+      new GymAction {
+        scheme = "App"
+        configuration = "release"
+      }
+      new ArchiveAction {
+        scheme = "App"
+        configuration = "release"
+        exportMethod = "app-store"
+      }
+    }
+  }
+}

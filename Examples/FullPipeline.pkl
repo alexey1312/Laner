@@ -1,0 +1,151 @@
+// FullPipeline.pkl
+// Example demonstrating a complete CI/CD pipeline with all action types.
+
+amends "pkl/Lanerfile.pkl"
+
+// Conditional flag based on CI environment
+local isCI = read?("env:CI") == "true"
+
+lanes {
+  // Development build
+  new {
+    name = "dev"
+    description = "Build for development"
+    actions {
+      new GymAction {
+        scheme = "MyApp"
+        workspace = "MyApp.xcworkspace"
+        configuration = "debug"
+        destination = "generic/platform=iOS"
+      }
+    }
+  }
+
+  // Run tests with coverage
+  new {
+    name = "test"
+    description = "Run unit and UI tests"
+    actions {
+      new ScanAction {
+        scheme = "MyApp"
+        workspace = "MyApp.xcworkspace"
+        devices {
+          "iPhone 15 Pro"
+          "iPad Pro"
+        }
+        codeCoverage = true
+      }
+    }
+  }
+
+  // Full CI pipeline
+  new {
+    name = "ci"
+    description = "Complete CI pipeline"
+    actions {
+      new GymAction {
+        scheme = "MyApp"
+        workspace = "MyApp.xcworkspace"
+        configuration = "debug"
+      }
+      new ScanAction {
+        scheme = "MyApp"
+        workspace = "MyApp.xcworkspace"
+        codeCoverage = true
+      }
+    }
+  }
+
+  // Release to TestFlight
+  new {
+    name = "testflight"
+    description = "Build and upload to TestFlight"
+    actions {
+      new MatchAction {
+        certificateType = "appstore"
+        readonly = isCI
+      }
+      new GymAction {
+        scheme = "MyApp"
+        configuration = "release"
+      }
+      new ArchiveAction {
+        scheme = "MyApp"
+        configuration = "release"
+        exportMethod = "app-store"
+      }
+      new PilotAction {
+        appId = "123456789"
+        changelog = "New features and bug fixes"
+        groups {
+          "Internal Testers"
+        }
+      }
+    }
+  }
+
+  // Ad-hoc distribution with export methods
+  new {
+    name = "adhoc"
+    description = "Build ad-hoc distribution"
+    actions {
+      new ArchiveAction {
+        scheme = "MyApp"
+        configuration = "release"
+        exportMethod = "ad-hoc"
+      }
+    }
+  }
+
+  // Enterprise distribution
+  new {
+    name = "enterprise"
+    description = "Build enterprise distribution"
+    actions {
+      new ArchiveAction {
+        scheme = "MyApp"
+        configuration = "release"
+        exportMethod = "enterprise"
+      }
+    }
+  }
+
+  // Beta build with new devices
+  new {
+    name = "beta"
+    description = "Register devices and build beta"
+    actions {
+      new RegisterDevicesAction {
+        file = "devices.txt"
+      }
+      new MatchAction {
+        certificateType = "adhoc"
+        forceForNewDevices = true
+      }
+      new GymAction {
+        scheme = "MyApp"
+        configuration = "release"
+      }
+    }
+  }
+
+  // Custom shell commands
+  new {
+    name = "lint"
+    description = "Run linting"
+    actions {
+      new ShellAction {
+        command = "swiftlint"
+        arguments {}
+      }
+      new ShellAction {
+        command = "swift"
+        arguments {
+          "format"
+          "--in-place"
+          "Sources/"
+        }
+      }
+    }
+  }
+}

@@ -1,5 +1,6 @@
 import ArgumentParser
 import Foundation
+import LanerDSL
 import LanerKit
 import Logging
 
@@ -23,6 +24,11 @@ public struct DoctorCommand: AsyncParsableCommand {
 
         var allPassed = true
 
+        // Check Pkl runtime
+        let pklCheck = await checkPkl()
+        printCheckResult("Pkl runtime", pklCheck)
+        if !pklCheck.passed { allPassed = false }
+
         // Check Swift
         let swiftCheck = await checkSwift()
         printCheckResult("Swift", swiftCheck)
@@ -32,6 +38,11 @@ public struct DoctorCommand: AsyncParsableCommand {
         let gitCheck = await checkGit()
         printCheckResult("Git", gitCheck)
         if !gitCheck.passed { allPassed = false }
+
+        // Check Lanerfile.pkl
+        let manifestCheck = await checkManifest()
+        printCheckResult("Lanerfile.pkl", manifestCheck)
+        if !manifestCheck.passed { allPassed = false }
 
         #if os(macOS)
             // Check Xcode (macOS only)
@@ -85,6 +96,29 @@ public struct DoctorCommand: AsyncParsableCommand {
             print("\(icon) \(name): \(message)")
         } else {
             print("\(icon) \(name)")
+        }
+    }
+
+    private func checkPkl() async -> CheckResult {
+        // Pkl runtime is embedded via pkl-swift — always available when the binary compiles
+        .success(version: "Embedded (pkl-swift)")
+    }
+
+    private func checkManifest() async -> CheckResult {
+        let workingDir = globalOptions.workingDirectoryURL
+        let loader = ManifestLoader()
+
+        guard loader.manifestExists(in: workingDir) else {
+            return .failure(message: "Not found. Run 'laner init' to create one.")
+        }
+
+        do {
+            let manifest = try await loader.load(from: workingDir)
+            return .success(version: "\(manifest.lanes.count) lane(s) defined")
+        } catch let error as ManifestError {
+            return .failure(message: error.description)
+        } catch {
+            return .failure(message: "Unexpected error: \(error.localizedDescription)")
         }
     }
 

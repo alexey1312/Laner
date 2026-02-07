@@ -3,10 +3,16 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-*'
 
 permissions:
   contents: write
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  MISE_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  MISE_GITHUB_GITHUB_ATTESTATIONS: false
 
 jobs:
   build:
@@ -21,7 +27,7 @@ jobs:
             platform: linux-x64
             arch: x86_64
             build-path: x86_64-unknown-linux-gnu/release
-            container: swift:6.0
+            container: swift:6.1
 
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.container }}
@@ -29,18 +35,27 @@ jobs:
     steps:
       - name: Install dependencies (Linux)
         if: matrix.platform == 'linux-x64'
-        run: apt-get update && apt-get install -y curl
+        run: |
+          apt-get update
+          apt-get install -y curl
 
       - uses: actions/checkout@v6
 
-      - name: Select Xcode 16 (macOS)
+      - name: Select Xcode 16.4 (macOS)
         if: matrix.platform == 'macos-arm64'
-        run: sudo xcode-select -s /Applications/Xcode_16.1.app/Contents/Developer
+        run: sudo xcode-select -s /Applications/Xcode_16.4.app/Contents/Developer
 
       - name: Setup mise
         uses: jdx/mise-action@v3
         with:
-          cache: true
+          experimental: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Add xcsift to PATH (Linux)
+        if: matrix.platform == 'linux-x64'
+        run: |
+          mise install xcsift
+          mise where xcsift >> "$GITHUB_PATH"
 
       - name: Replace version placeholder
         run: |
@@ -53,7 +68,7 @@ jobs:
           fi
 
       - name: Build release binary
-        run: swift build -c release --arch ${{ matrix.arch }} 2>&1 | xcbeautify
+        run: swift build -c release --arch ${{ matrix.arch }} 2>&1 | xcsift
 
       - name: Create release archive
         run: |

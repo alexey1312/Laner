@@ -63,7 +63,7 @@ jobs:
     needs: lint
     runs-on: ubuntu-latest
     container:
-      image: swift:6.0
+      image: swift:6.1
     steps:
       - name: Install dependencies
         run: |

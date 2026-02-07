@@ -4,9 +4,9 @@ import LanerDSL
 import LanerKit
 import Logging
 
-/// Executes a named lane from the Lanerfile.
+/// Executes a named lane from the Lanerfile.pkl.
 ///
-/// This command loads the manifest, finds the requested lane by name,
+/// This command loads the Pkl manifest, finds the requested lane by name,
 /// and executes it using a `LaneRunner`. It provides formatted output
 /// showing execution progress and results.
 ///
@@ -40,33 +40,19 @@ public struct LaneCommand: AsyncParsableCommand {
         logger.debug("Loading manifest...")
         let loader = ManifestLoader(logger: logger)
 
-        let manifest: Lanerfile
+        let manifest: Lanerfile.Module
         do {
             manifest = try await loader.load(from: directory)
         } catch let error as ManifestError {
-            // Handle manifest-specific errors with user-friendly messages
             switch error {
             case .notFound:
-                print("Error: Lanerfile.swift not found.")
+                print("Error: Lanerfile.pkl not found.")
                 print("Run 'laner init' to create a new manifest.")
                 throw ExitCode.failure
-            case let .compilationFailed(output):
-                print("Error: Failed to compile Lanerfile.swift")
+            case let .evaluationFailed(details):
+                print("Error: Failed to evaluate Lanerfile.pkl")
                 print("")
-                print(output)
-                throw ExitCode.failure
-            case let .executionFailed(output):
-                print("Error: Failed to execute manifest")
-                print("")
-                print(output)
-                throw ExitCode.failure
-            case let .invalidOutput(details):
-                print("Error: Invalid manifest output")
                 print(details)
-                throw ExitCode.failure
-            case .installPathNotFound:
-                print("Error: Could not determine Laner installation path")
-                print("Ensure Laner is properly installed with lib/laner/ directory.")
                 throw ExitCode.failure
             case let .versionMismatch(expected, found):
                 print("Error: DSL version mismatch")
@@ -88,7 +74,6 @@ public struct LaneCommand: AsyncParsableCommand {
         // Execute lane
         print("Running lane '\(laneName)'...")
 
-        // Create runner and execute on MainActor
         let runner = LaneRunner(logger: logger)
         let result = await Self.executeOnMainActor(lane: lane, runner: runner, logger: logger, directory: directory)
 
@@ -103,7 +88,7 @@ public struct LaneCommand: AsyncParsableCommand {
                 print("")
                 print("Artifacts:")
                 for artifact in result.artifacts {
-                    print("  • \(artifact.type): \(artifact.path.path(percentEncoded: false))")
+                    print("  \(artifact.type): \(artifact.path.path(percentEncoded: false))")
                 }
             }
         } else {
@@ -119,16 +104,9 @@ public struct LaneCommand: AsyncParsableCommand {
         }
     }
 
-    /// Executes a lane on the MainActor.
-    /// - Parameters:
-    ///   - lane: The lane to execute.
-    ///   - runner: The lane runner.
-    ///   - logger: The logger for execution.
-    ///   - directory: The working directory.
-    /// - Returns: The execution result.
     @MainActor
     private static func executeOnMainActor(
-        lane: Lane,
+        lane: Lanerfile.Lane,
         runner: LaneRunner,
         logger: Logger,
         directory: URL

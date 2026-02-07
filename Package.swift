@@ -1,4 +1,4 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 6.1
 
 import PackageDescription
 
@@ -26,6 +26,7 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-log", from: "1.9.1"),
         .package(url: "https://github.com/apple/swift-crypto", from: "3.15.1"),
         .package(url: "https://github.com/swift-server/async-http-client", from: "1.30.3"),
+        .package(url: "https://github.com/apple/pkl-swift", from: "0.7.2"),
     ],
     targets: [
         // Executable
@@ -48,6 +49,7 @@ let package = Package(
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "Logging", package: "swift-log"),
                 .product(name: "Crypto", package: "swift-crypto"),
+                .product(name: "PklSwift", package: "pkl-swift"),
             ],
             swiftSettings: warningsAsErrors
         ),
@@ -59,6 +61,10 @@ let package = Package(
                 "LanerKit",
                 "LanerMatch",
                 .product(name: "Logging", package: "swift-log"),
+                .product(name: "PklSwift", package: "pkl-swift"),
+            ],
+            resources: [
+                .copy("Resources/pkl"),
             ],
             swiftSettings: warningsAsErrors
         ),

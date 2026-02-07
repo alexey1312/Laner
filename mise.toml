@@ -55,6 +55,14 @@ run = "hk check --all 2>&1 | grep -E '^(✔|✗|hk )'"
 description = "Pre-commit checks"
 run = "hk check --all 2>&1 | grep -E '^(✔|✗|hk )'"
 
+[tasks."hooks:install"]
+description = "Install git hooks"
+run = "git config core.hooksPath .githooks && echo 'Git hooks installed (.githooks)'"
+
+[tasks."hooks:uninstall"]
+description = "Uninstall git hooks"
+run = "git config --unset core.hooksPath && echo 'Git hooks uninstalled'"
+
 [tasks.clean]
 description = "Clean build"
 run = "swift package clean && rm -rf .build"

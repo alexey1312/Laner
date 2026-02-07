@@ -16,128 +16,7 @@ public enum ExportMethod: String, Sendable, Codable {
     case enterprise
 }
 
-// MARK: - DSL Functions
-
-/// Builds an iOS/macOS app using xcodebuild.
-///
-/// This action builds a scheme and produces an IPA or app bundle.
-///
-/// ## Example
-/// ```swift
-/// lane {
-///     gym(
-///         scheme: "MyApp",
-///         workspace: "MyApp.xcworkspace",
-///         configuration: .release,
-///         destination: "generic/platform=iOS"
-///     )
-/// }
-/// ```
-///
-/// - Parameters:
-///   - scheme: The Xcode scheme to build.
-///   - workspace: The workspace file path (optional, mutually exclusive with project).
-///   - project: The project file path (optional, mutually exclusive with workspace).
-///   - configuration: The build configuration (Debug or Release).
-///   - destination: The build destination (e.g., "generic/platform=iOS").
-/// - Returns: A type-erased action that can be executed in a lane.
-public func gym(
-    scheme: String,
-    workspace: String? = nil,
-    project: String? = nil,
-    configuration: BuildConfiguration = .debug,
-    destination: String? = nil
-) -> AnyAction {
-    AnyAction(
-        GymAction(
-            options: GymOptions(
-                scheme: scheme,
-                workspace: workspace,
-                project: project,
-                configuration: configuration,
-                destination: destination
-            )
-        )
-    )
-}
-
-/// Runs tests using xcodebuild.
-///
-/// This action executes unit and UI tests for a scheme.
-///
-/// ## Example
-/// ```swift
-/// lane {
-///     scan(
-///         scheme: "MyApp",
-///         workspace: "MyApp.xcworkspace",
-///         devices: ["iPhone 15 Pro"],
-///         codeCoverage: true
-///     )
-/// }
-/// ```
-///
-/// - Parameters:
-///   - scheme: The Xcode scheme to test.
-///   - workspace: The workspace file path (optional).
-///   - devices: The devices to run tests on (optional).
-///   - codeCoverage: Whether to enable code coverage collection.
-/// - Returns: A type-erased action that can be executed in a lane.
-public func scan(
-    scheme: String,
-    workspace: String? = nil,
-    devices: [String]? = nil,
-    codeCoverage: Bool = false
-) -> AnyAction {
-    AnyAction(
-        ScanAction(
-            options: ScanOptions(
-                scheme: scheme,
-                workspace: workspace,
-                devices: devices,
-                codeCoverage: codeCoverage
-            )
-        )
-    )
-}
-
-/// Archives an app and exports an IPA.
-///
-/// This action creates an archive of the app and exports it with the specified method.
-///
-/// ## Example
-/// ```swift
-/// lane {
-///     archive(
-///         scheme: "MyApp",
-///         configuration: .release,
-///         exportMethod: .appStore
-///     )
-/// }
-/// ```
-///
-/// - Parameters:
-///   - scheme: The Xcode scheme to archive.
-///   - configuration: The build configuration (defaults to Release).
-///   - exportMethod: The export method (app-store, ad-hoc, development, enterprise).
-/// - Returns: A type-erased action that can be executed in a lane.
-public func archive(
-    scheme: String,
-    configuration: BuildConfiguration = .release,
-    exportMethod: ExportMethod = .appStore
-) -> AnyAction {
-    AnyAction(
-        ArchiveAction(
-            options: ArchiveOptions(
-                scheme: scheme,
-                configuration: configuration,
-                exportMethod: exportMethod
-            )
-        )
-    )
-}
-
-// MARK: - Placeholder Actions
+// MARK: - Action Implementations
 
 /// Options for the gym action.
 struct GymOptions: Sendable {
@@ -148,10 +27,7 @@ struct GymOptions: Sendable {
     let destination: String?
 }
 
-/// Placeholder action for building apps.
-///
-/// This is a placeholder implementation that will be replaced with actual
-/// xcodebuild integration in the future.
+/// Builds an iOS/macOS app using xcodebuild (placeholder — logs parameters only).
 struct GymAction: Action {
     typealias Options = GymOptions
     typealias Result = Void
@@ -189,10 +65,7 @@ struct ScanOptions: Sendable {
     let codeCoverage: Bool
 }
 
-/// Placeholder action for running tests.
-///
-/// This is a placeholder implementation that will be replaced with actual
-/// xcodebuild test integration in the future.
+/// Runs tests using xcodebuild (placeholder — logs parameters only).
 struct ScanAction: Action {
     typealias Options = ScanOptions
     typealias Result = Void
@@ -229,10 +102,7 @@ struct ArchiveOptions: Sendable {
     let exportMethod: ExportMethod
 }
 
-/// Placeholder action for archiving apps.
-///
-/// This is a placeholder implementation that will be replaced with actual
-/// xcodebuild archive integration in the future.
+/// Archives an app and exports an IPA (placeholder — logs parameters only).
 struct ArchiveAction: Action {
     typealias Options = ArchiveOptions
     typealias Result = Void

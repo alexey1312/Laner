@@ -1,0 +1,148 @@
+/// Laner CI/CD pipeline configuration.
+///
+/// This module defines the schema for Lanerfile.pkl files.
+/// Users amend this module to define their CI/CD lanes and actions.
+///
+/// Example:
+/// ```pkl
+/// amends "pkl/Lanerfile.pkl"
+///
+/// lanes {
+///   new { name = "build"; actions { new GymAction { scheme = "App" } } }
+/// }
+/// ```
+module Lanerfile
+
+/// Build configuration for Xcode projects.
+typealias BuildConfiguration = "debug"|"release"
+
+/// Export method for archive actions.
+typealias ExportMethod = "app-store"|"ad-hoc"|"development"|"enterprise"
+
+/// Certificate type for code signing.
+typealias CertificateType = "development"|"distribution"|"adhoc"|"appstore"
+
+/// Device platform for registration.
+typealias DevicePlatform = "iOS"|"macOS"|"tvOS"|"watchOS"|"visionOS"
+
+/// Base class for all pipeline actions.
+open class Action {
+  /// Discriminator for action dispatch.
+  fixed type: String
+}
+
+/// Builds an iOS/macOS app using xcodebuild.
+class GymAction extends Action {
+  fixed type = "gym"
+  /// The Xcode scheme to build.
+  scheme: String
+  /// The workspace file path.
+  workspace: String?
+  /// The project file path.
+  project: String?
+  /// The build configuration.
+  configuration: BuildConfiguration = "debug"
+  /// The build destination.
+  destination: String?
+}
+
+/// Runs tests using xcodebuild.
+class ScanAction extends Action {
+  fixed type = "scan"
+  /// The Xcode scheme to test.
+  scheme: String
+  /// The workspace file path.
+  workspace: String?
+  /// Devices to run tests on.
+  devices: Listing<String>?
+  /// Whether to enable code coverage.
+  codeCoverage: Boolean = false
+}
+
+/// Archives an app and exports an IPA.
+class ArchiveAction extends Action {
+  fixed type = "archive"
+  /// The Xcode scheme to archive.
+  scheme: String
+  /// The build configuration.
+  configuration: BuildConfiguration = "release"
+  /// The export method.
+  exportMethod: ExportMethod = "app-store"
+}
+
+/// Syncs code signing certificates and provisioning profiles.
+class MatchAction extends Action {
+  fixed type = "match"
+  /// The certificate type to sync.
+  certificateType: CertificateType
+  /// Whether to run in readonly mode.
+  readonly: Boolean = false
+  /// App identifier to sync profiles for.
+  appIdentifier: String?
+  /// Team ID for code signing.
+  teamId: String?
+  /// Git repository URL for certificate storage.
+  gitUrl: String?
+  /// Force regenerate profiles when new devices are added.
+  forceForNewDevices: Boolean = false
+  /// Git branch to use.
+  branch: String = "master"
+  /// Encryption password for certificates.
+  password: String?
+}
+
+/// Uploads a build to TestFlight.
+class PilotAction extends Action {
+  fixed type = "pilot"
+  /// Path to the IPA file to upload.
+  ipa: String?
+  /// The App Store Connect app ID.
+  appId: String?
+  /// Release notes for TestFlight testers.
+  changelog: String?
+  /// Names of beta groups to distribute to.
+  groups: Listing<String>?
+  /// Skip waiting for Apple to process the build.
+  skipWaitingForProcessing: Boolean = true
+}
+
+/// Registers devices with Apple Developer Portal.
+class RegisterDevicesAction extends Action {
+  fixed type = "register_devices"
+  /// Path to a file containing device names and UDIDs.
+  file: String?
+  /// Dictionary of device name to UDID mappings.
+  devices: Mapping<String, String>?
+  /// Platform for the devices.
+  platform: DevicePlatform = "iOS"
+  /// Team ID for device registration.
+  teamId: String?
+  /// App Store Connect API key ID.
+  apiKeyId: String?
+  /// App Store Connect API issuer ID.
+  apiIssuerId: String?
+  /// Path to App Store Connect API private key (.p8).
+  apiKeyPath: String?
+}
+
+/// Executes an arbitrary shell command.
+class ShellAction extends Action {
+  fixed type = "shell"
+  /// The command to execute.
+  command: String
+  /// Arguments to pass to the command.
+  arguments: Listing<String> = new {}
+}
+
+/// A named sequence of actions in a CI/CD pipeline.
+class Lane {
+  /// The unique name of this lane.
+  name: String
+  /// A human-readable description of what this lane does.
+  description: String = ""
+  /// The actions to execute in order.
+  actions: Listing<Action>
+}
+
+/// The lanes defined in this configuration.
+lanes: Listing<Lane>
